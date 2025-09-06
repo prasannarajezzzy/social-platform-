@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BarChart3, 
   Users, 
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isAddingLink, setIsAddingLink] = useState(false);
   const [newLink, setNewLink] = useState({ title: '', url: '', description: '' });
@@ -334,11 +336,17 @@ const Dashboard = () => {
               <p>Manage your content, links, and track your performance</p>
             </div>
             <div className="header-actions">
-              <button className="btn btn-ghost">
+              <button 
+                className="btn btn-ghost"
+                onClick={() => navigate('/profile')}
+              >
                 <Settings size={20} />
                 Settings
               </button>
-              <button className="btn btn-primary">
+              <button 
+                className="btn btn-primary"
+                onClick={() => navigate('/profile/public')}
+              >
                 <ExternalLink size={20} />
                 View Profile
               </button>
