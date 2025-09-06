@@ -25,7 +25,8 @@ export const ProfileProvider = ({ children }) => {
       facebook: '',
       tiktok: '',
       website: ''
-    }
+    },
+    customLinks: []
   });
 
   const [appearanceData, setAppearanceData] = useState({
@@ -88,6 +89,51 @@ export const ProfileProvider = ({ children }) => {
     }));
   };
 
+  const addCustomLink = (link) => {
+    const newLink = {
+      id: Date.now().toString(),
+      title: link.title,
+      url: link.url,
+      description: link.description || '',
+      icon: link.icon || 'ExternalLink',
+      isActive: true,
+      clicks: 0
+    };
+    
+    setProfileData(prev => ({
+      ...prev,
+      customLinks: [...prev.customLinks, newLink]
+    }));
+  };
+
+  const updateCustomLink = (linkId, updates) => {
+    setProfileData(prev => ({
+      ...prev,
+      customLinks: prev.customLinks.map(link => 
+        link.id === linkId ? { ...link, ...updates } : link
+      )
+    }));
+  };
+
+  const deleteCustomLink = (linkId) => {
+    setProfileData(prev => ({
+      ...prev,
+      customLinks: prev.customLinks.filter(link => link.id !== linkId)
+    }));
+  };
+
+  const reorderCustomLinks = (fromIndex, toIndex) => {
+    setProfileData(prev => {
+      const newLinks = [...prev.customLinks];
+      const [removed] = newLinks.splice(fromIndex, 1);
+      newLinks.splice(toIndex, 0, removed);
+      return {
+        ...prev,
+        customLinks: newLinks
+      };
+    });
+  };
+
   const updateAppearance = (updates) => {
     setAppearanceData(prev => ({
       ...prev,
@@ -129,7 +175,8 @@ export const ProfileProvider = ({ children }) => {
         facebook: '',
         tiktok: '',
         website: ''
-      }
+      },
+      customLinks: []
     });
   };
 
@@ -217,7 +264,11 @@ export const ProfileProvider = ({ children }) => {
     resetAppearance,
     getThemeStyles,
     getFontFamily,
-    getButtonStyles
+    getButtonStyles,
+    addCustomLink,
+    updateCustomLink,
+    deleteCustomLink,
+    reorderCustomLinks
   };
 
   return (

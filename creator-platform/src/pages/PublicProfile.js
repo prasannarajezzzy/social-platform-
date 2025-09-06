@@ -26,14 +26,8 @@ const PublicProfile = () => {
   const fontFamily = getFontFamily();
   const buttonStyles = getButtonStyles();
 
-  // Mock links data - in a real app, this would come from the backend
-  const links = [
-    { id: 1, title: 'My YouTube Channel', url: 'https://youtube.com/@creator', icon: Youtube, clicks: 1234 },
-    { id: 2, title: 'Instagram Profile', url: 'https://instagram.com/creator', icon: Instagram, clicks: 892 },
-    { id: 3, title: 'Latest Blog Post', url: 'https://blog.creator.com/latest', icon: ExternalLink, clicks: 567 },
-    { id: 4, title: 'Support My Work', url: 'https://patreon.com/creator', icon: Heart, clicks: 345 },
-    { id: 5, title: 'Portfolio Website', url: 'https://creator.com', icon: Globe, clicks: 234 }
-  ];
+  // Get active custom links from profile data
+  const activeCustomLinks = profileData.customLinks ? profileData.customLinks.filter(link => link.isActive) : [];
 
   const getSocialIcon = (platform) => {
     const icons = {
@@ -47,6 +41,23 @@ const PublicProfile = () => {
       website: Globe
     };
     return icons[platform] || Globe;
+  };
+
+  const getCustomLinkIcon = (iconId) => {
+    const icons = {
+      ExternalLink: ExternalLink,
+      Globe: Globe,
+      Youtube: Youtube,
+      Instagram: Instagram,
+      Twitter: Twitter,
+      Linkedin: Linkedin,
+      Github: Github,
+      Facebook: Facebook,
+      Music: Music,
+      ShoppingBag: ExternalLink, // Using ExternalLink as fallback for ShoppingBag
+      Upload: ExternalLink // Using ExternalLink as fallback for Upload
+    };
+    return icons[iconId] || ExternalLink;
   };
 
   const handleLinkClick = (link) => {
@@ -76,10 +87,18 @@ const PublicProfile = () => {
   const renderLinks = () => {
     const layoutClass = `links-container ${appearanceData.buttonLayout}`;
     
+    if (activeCustomLinks.length === 0) {
+      return (
+        <div className="no-links-message">
+          <p>No links available yet.</p>
+        </div>
+      );
+    }
+    
     return (
       <div className={layoutClass}>
-        {links.map((link) => {
-          const IconComponent = link.icon;
+        {activeCustomLinks.map((link) => {
+          const IconComponent = getCustomLinkIcon(link.icon);
           return (
             <button
               key={link.id}
@@ -96,6 +115,9 @@ const PublicProfile = () => {
                 <span className="link-title">{link.title}</span>
                 <ExternalLink size={16} className="link-external" />
               </div>
+              {link.description && (
+                <div className="link-description">{link.description}</div>
+              )}
             </button>
           );
         })}
@@ -428,6 +450,24 @@ const PublicProfile = () => {
 
         .link-external {
           opacity: 0.7;
+        }
+
+        .link-description {
+          font-size: 0.9rem;
+          opacity: 0.8;
+          margin-top: 4px;
+          text-align: left;
+        }
+
+        .no-links-message {
+          text-align: center;
+          padding: 40px 20px;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .no-links-message p {
+          font-size: 1.1rem;
+          margin: 0;
         }
 
         @media (max-width: 768px) {

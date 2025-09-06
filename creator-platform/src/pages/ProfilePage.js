@@ -20,7 +20,10 @@ import {
   ArrowLeft,
   Camera,
   X,
-  Plus
+  Plus,
+  Edit3,
+  Trash2,
+  ShoppingBag
 } from 'lucide-react';
 import { useProfile } from '../contexts/ProfileContext';
 
@@ -33,11 +36,18 @@ const ProfilePage = () => {
     updateSocialLink, 
     updateAppearance, 
     saveProfile,
-    isLoading 
+    isLoading,
+    addCustomLink,
+    updateCustomLink,
+    deleteCustomLink,
+    reorderCustomLinks
   } = useProfile();
   
   const [activeTab, setActiveTab] = useState('profile');
   const [previewMode, setPreviewMode] = useState(false);
+  const [showAddLinkForm, setShowAddLinkForm] = useState(false);
+  const [editingLink, setEditingLink] = useState(null);
+  const [linkForm, setLinkForm] = useState({ title: '', url: '', description: '', icon: 'ExternalLink' });
   const fileInputRef = useRef(null);
 
   const themes = [
@@ -68,6 +78,20 @@ const ProfilePage = () => {
     { id: 'roboto', name: 'Roboto', style: 'font-family: Roboto, sans-serif;' },
     { id: 'montserrat', name: 'Montserrat', style: 'font-family: Montserrat, sans-serif;' },
     { id: 'playfair', name: 'Playfair Display', style: 'font-family: "Playfair Display", serif;' }
+  ];
+
+  const availableIcons = [
+    { id: 'ExternalLink', name: 'External Link', component: LinkIcon },
+    { id: 'Globe', name: 'Website', component: Globe },
+    { id: 'Youtube', name: 'YouTube', component: Youtube },
+    { id: 'Instagram', name: 'Instagram', component: Instagram },
+    { id: 'Twitter', name: 'Twitter', component: Twitter },
+    { id: 'Linkedin', name: 'LinkedIn', component: Linkedin },
+    { id: 'Github', name: 'GitHub', component: Github },
+    { id: 'Facebook', name: 'Facebook', component: Facebook },
+    { id: 'Music', name: 'TikTok/Music', component: Music },
+    { id: 'ShoppingBag', name: 'Shop', component: ShoppingBag },
+    { id: 'Upload', name: 'Portfolio', component: Upload }
   ];
 
   const handleProfileImageUpload = (event) => {
@@ -117,6 +141,64 @@ const ProfilePage = () => {
       website: Globe
     };
     return icons[platform] || LinkIcon;
+  };
+
+  const getIconComponent = (iconId) => {
+    const icon = availableIcons.find(i => i.id === iconId);
+    return icon ? icon.component : LinkIcon;
+  };
+
+  const handleLinkFormSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!linkForm.title.trim() || !linkForm.url.trim()) {
+      alert('Please fill in title and URL');
+      return;
+    }
+
+    // Ensure URL has protocol
+    let url = linkForm.url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    const linkData = {
+      ...linkForm,
+      url
+    };
+
+    if (editingLink) {
+      updateCustomLink(editingLink.id, linkData);
+      setEditingLink(null);
+    } else {
+      addCustomLink(linkData);
+    }
+
+    setLinkForm({ title: '', url: '', description: '', icon: 'ExternalLink' });
+    setShowAddLinkForm(false);
+  };
+
+  const handleEditLink = (link) => {
+    setLinkForm({
+      title: link.title,
+      url: link.url,
+      description: link.description || '',
+      icon: link.icon
+    });
+    setEditingLink(link);
+    setShowAddLinkForm(true);
+  };
+
+  const handleDeleteLink = (linkId) => {
+    if (window.confirm('Are you sure you want to delete this link?')) {
+      deleteCustomLink(linkId);
+    }
+  };
+
+  const handleCancelLinkForm = () => {
+    setLinkForm({ title: '', url: '', description: '', icon: 'ExternalLink' });
+    setEditingLink(null);
+    setShowAddLinkForm(false);
   };
 
   const renderProfileTab = () => (
@@ -224,6 +306,152 @@ const ProfilePage = () => {
               </div>
             );
           })}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderLinksTab = () => (
+    <div className="links-content">
+      <div className="profile-section">
+        <div className="section-header">
+          <h3 className="section-title">
+            <LinkIcon size={20} />
+            Custom Links
+          </h3>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowAddLinkForm(true)}
+          >
+            <Plus size={16} />
+            Add Link
+          </button>
+        </div>
+        
+        {showAddLinkForm && (
+          <div className="add-link-form">
+            <form onSubmit={handleLinkFormSubmit}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Title</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={linkForm.title}
+                    onChange={(e) => setLinkForm(prev => ({...prev, title: e.target.value}))}
+                    placeholder="e.g., My YouTube Channel"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label className="form-label">URL</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    value={linkForm.url}
+                    onChange={(e) => setLinkForm(prev => ({...prev, url: e.target.value}))}
+                    placeholder="https://example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description (Optional)</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={linkForm.description}
+                  onChange={(e) => setLinkForm(prev => ({...prev, description: e.target.value}))}
+                  placeholder="Brief description of the link"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Icon</label>
+                <div className="icon-selection">
+                  {availableIcons.map(icon => {
+                    const IconComponent = icon.component;
+                    return (
+                      <button
+                        key={icon.id}
+                        type="button"
+                        className={`icon-option ${linkForm.icon === icon.id ? 'selected' : ''}`}
+                        onClick={() => setLinkForm(prev => ({...prev, icon: icon.id}))}
+                        title={icon.name}
+                      >
+                        <IconComponent size={16} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button type="button" className="btn btn-ghost" onClick={handleCancelLinkForm}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  {editingLink ? 'Update Link' : 'Add Link'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        <div className="custom-links-list">
+          {profileData.customLinks.length === 0 ? (
+            <div className="empty-state">
+              <LinkIcon size={48} />
+              <h4>No custom links yet</h4>
+              <p>Add your first custom link to get started</p>
+            </div>
+          ) : (
+            profileData.customLinks.map((link, index) => {
+              const IconComponent = getIconComponent(link.icon);
+              return (
+                <div key={link.id} className="custom-link-item">
+                  <div className="link-icon">
+                    <IconComponent size={20} />
+                  </div>
+                  <div className="link-info">
+                    <h4 className="link-title">{link.title}</h4>
+                    <p className="link-url">{link.url}</p>
+                    {link.description && (
+                      <p className="link-description">{link.description}</p>
+                    )}
+                    <div className="link-stats">
+                      <span className="link-clicks">{link.clicks} clicks</span>
+                      <span className={`link-status ${link.isActive ? 'active' : 'inactive'}`}>
+                        {link.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="link-actions">
+                    <button 
+                      className="btn btn-sm btn-ghost"
+                      onClick={() => updateCustomLink(link.id, { isActive: !link.isActive })}
+                    >
+                      {link.isActive ? 'Hide' : 'Show'}
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-ghost"
+                      onClick={() => handleEditLink(link)}
+                    >
+                      <Edit3 size={14} />
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-ghost text-red"
+                      onClick={() => handleDeleteLink(link.id)}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>
@@ -445,24 +673,48 @@ const ProfilePage = () => {
           </div>
           
           <div className={`preview-buttons ${appearanceData.buttonLayout}`}>
-            <button 
-              className="preview-button"
-              style={{
-                background: appearanceData.brandColor,
-                borderRadius: buttonStyles.find(s => s.id === appearanceData.buttonStyle)?.preview?.match(/border-radius: ([^;]+);/)?.[1] || '12px'
-              }}
-            >
-              Sample Link
-            </button>
-            <button 
-              className="preview-button"
-              style={{
-                background: appearanceData.brandColor,
-                borderRadius: buttonStyles.find(s => s.id === appearanceData.buttonStyle)?.preview?.match(/border-radius: ([^;]+);/)?.[1] || '12px'
-              }}
-            >
-              Another Link
-            </button>
+            {profileData.customLinks && profileData.customLinks.filter(link => link.isActive).length > 0 ? (
+              profileData.customLinks
+                .filter(link => link.isActive)
+                .slice(0, 3)
+                .map(link => {
+                  const IconComponent = getIconComponent(link.icon);
+                  return (
+                    <button 
+                      key={link.id}
+                      className="preview-button"
+                      style={{
+                        background: appearanceData.brandColor,
+                        borderRadius: buttonStyles.find(s => s.id === appearanceData.buttonStyle)?.preview?.match(/border-radius: ([^;]+);/)?.[1] || '12px'
+                      }}
+                    >
+                      <IconComponent size={16} style={{ marginRight: '8px' }} />
+                      {link.title}
+                    </button>
+                  );
+                })
+            ) : (
+              <>
+                <button 
+                  className="preview-button"
+                  style={{
+                    background: appearanceData.brandColor,
+                    borderRadius: buttonStyles.find(s => s.id === appearanceData.buttonStyle)?.preview?.match(/border-radius: ([^;]+);/)?.[1] || '12px'
+                  }}
+                >
+                  Sample Link
+                </button>
+                <button 
+                  className="preview-button"
+                  style={{
+                    background: appearanceData.brandColor,
+                    borderRadius: buttonStyles.find(s => s.id === appearanceData.buttonStyle)?.preview?.match(/border-radius: ([^;]+);/)?.[1] || '12px'
+                  }}
+                >
+                  Another Link
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -518,6 +770,13 @@ const ProfilePage = () => {
               Profile
             </button>
             <button 
+              className={`nav-tab ${activeTab === 'links' ? 'active' : ''}`}
+              onClick={() => setActiveTab('links')}
+            >
+              <LinkIcon size={20} />
+              Links
+            </button>
+            <button 
               className={`nav-tab ${activeTab === 'appearance' ? 'active' : ''}`}
               onClick={() => setActiveTab('appearance')}
             >
@@ -531,6 +790,7 @@ const ProfilePage = () => {
       <div className="profile-content-wrapper">
         <div className="container">
           {activeTab === 'profile' && renderProfileTab()}
+          {activeTab === 'links' && renderLinksTab()}
           {activeTab === 'appearance' && renderAppearanceTab()}
         </div>
       </div>
@@ -1042,13 +1302,188 @@ const ProfilePage = () => {
           cursor: pointer;
           transition: all 0.3s ease;
           text-decoration: none;
-          display: block;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .preview-button:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Links Tab Styles */
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+
+        .add-link-form {
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 24px;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        .icon-selection {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+          gap: 8px;
+          max-width: 600px;
+        }
+
+        .icon-option {
+          width: 50px;
+          height: 50px;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          background: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .icon-option:hover {
+          border-color: #cbd5e1;
+        }
+
+        .icon-option.selected {
+          border-color: #667eea;
+          background: #f0f4ff;
+          color: #667eea;
+        }
+
+        .form-actions {
+          display: flex;
+          gap: 12px;
+          justify-content: flex-end;
+          margin-top: 24px;
+        }
+
+        .custom-links-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 48px 24px;
+          color: #6b7280;
+        }
+
+        .empty-state h4 {
+          margin: 16px 0 8px;
+          color: #374151;
+        }
+
+        .custom-link-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          padding: 20px;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          transition: all 0.3s ease;
+        }
+
+        .custom-link-item:hover {
+          border-color: #cbd5e1;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .link-icon {
+          width: 48px;
+          height: 48px;
+          background: #667eea;
+          color: white;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .link-info {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .link-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 4px;
+        }
+
+        .link-url {
+          font-size: 0.9rem;
+          color: #667eea;
+          margin-bottom: 4px;
+          word-break: break-all;
+        }
+
+        .link-description {
+          font-size: 0.9rem;
+          color: #6b7280;
+          margin-bottom: 8px;
+        }
+
+        .link-stats {
+          display: flex;
+          gap: 16px;
+          font-size: 0.8rem;
+        }
+
+        .link-clicks {
+          color: #374151;
+        }
+
+        .link-status {
+          font-weight: 500;
+        }
+
+        .link-status.active {
+          color: #059669;
+        }
+
+        .link-status.inactive {
+          color: #dc2626;
+        }
+
+        .link-actions {
+          display: flex;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .btn-sm {
+          padding: 6px 12px;
+          font-size: 14px;
+        }
+
+        .text-red {
+          color: #dc2626;
+        }
+
+        .text-red:hover {
+          color: #b91c1c;
         }
 
         @media (max-width: 768px) {
@@ -1077,6 +1512,29 @@ const ProfilePage = () => {
 
           .layout-options {
             justify-content: center;
+          }
+
+          .form-row {
+            grid-template-columns: 1fr;
+          }
+
+          .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+
+          .custom-link-item {
+            flex-direction: column;
+            text-align: center;
+          }
+
+          .link-actions {
+            justify-content: center;
+          }
+
+          .icon-selection {
+            grid-template-columns: repeat(4, 1fr);
           }
         }
       `}</style>
