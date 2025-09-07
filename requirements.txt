@@ -1,0 +1,14 @@
+# MongoDB Testing Requirements
+# Install with: pip install -r requirements.txt
+
+# MongoDB Python driver
+pymongo>=4.6.0
+
+# Optional: For enhanced functionality
+# dnspython>=2.4.0  # For SRV record support (already included with pymongo[srv])
+# certifi>=2023.0.0  # For SSL certificate verification
+
+# Development/Testing tools (optional)
+# pytest>=7.4.0
+# python-dotenv>=1.0.0  # For environment variable management
+

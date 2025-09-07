@@ -1,0 +1,5 @@
+MONGODB_URI=mongodb+srv://prasannavadk_db_user:DcNyfo4h5BlmMkUp@cluster0.ojj7xdb.mongodb.net/creator-platform?retryWrites=true&w=majority
+JWT_SECRET=your-super-secret-jwt-key-change-in-production-2024
+PORT=5000
+NODE_ENV=development
+BCRYPT_ROUNDS=12
