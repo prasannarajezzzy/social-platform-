@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useProfile } from '../contexts/ProfileContext';
 import { 
   BarChart3, 
   Users, 
@@ -20,24 +21,22 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { profileData } = useProfile();
   const [activeTab, setActiveTab] = useState('overview');
-  const [isAddingLink, setIsAddingLink] = useState(false);
-  const [newLink, setNewLink] = useState({ title: '', url: '', description: '' });
 
-  // Mock data
+  // Get actual data from profile
+  const customLinks = profileData.customLinks || [];
+  const activeLinks = customLinks.filter(link => link.isActive);
+  const totalClicks = customLinks.reduce((sum, link) => sum + (link.clicks || 0), 0);
+  const averageClickRate = customLinks.length > 0 ? (totalClicks / customLinks.length).toFixed(1) : 0;
+  
+  // Calculate actual stats
   const stats = {
-    totalViews: 12543,
-    followers: 8921,
-    revenue: 2847,
-    clickRate: 4.7
+    totalClicks: totalClicks,
+    activeLinks: activeLinks.length,
+    totalLinks: customLinks.length,
+    clickRate: averageClickRate
   };
-
-  const links = [
-    { id: 1, title: 'My YouTube Channel', url: 'https://youtube.com/@creator', clicks: 1234, isActive: true },
-    { id: 2, title: 'Instagram Profile', url: 'https://instagram.com/creator', clicks: 892, isActive: true },
-    { id: 3, title: 'Latest Blog Post', url: 'https://blog.creator.com/latest', clicks: 567, isActive: true },
-    { id: 4, title: 'Patreon Support', url: 'https://patreon.com/creator', clicks: 345, isActive: false }
-  ];
 
   const products = [
     { id: 1, name: 'Photography Course', price: 99, sales: 47, revenue: 4653, image: '📸' },
@@ -45,20 +44,44 @@ const Dashboard = () => {
     { id: 3, name: '1-on-1 Consultation', price: 150, sales: 12, revenue: 1800, image: '💬' }
   ];
 
-  const recentActivity = [
-    { id: 1, action: 'Link clicked', item: 'YouTube Channel', time: '2 minutes ago' },
-    { id: 2, action: 'Product purchased', item: 'Photography Course', time: '1 hour ago' },
-    { id: 3, action: 'New follower', item: 'Instagram', time: '3 hours ago' },
-    { id: 4, action: 'Link shared', item: 'Blog Post', time: '5 hours ago' }
-  ];
+  // Generate recent activity based on actual data
+  const recentActivity = [];
+  
+  // Add recent link activity
+  activeLinks.slice(0, 3).forEach((link, index) => {
+    if (link.clicks > 0) {
+      recentActivity.push({
+        id: index + 1,
+        action: 'Link clicked',
+        item: link.title,
+        time: `${Math.floor(Math.random() * 24)} hours ago`
+      });
+    }
+  });
+  
+  // Add profile activity
+  if (profileData.title) {
+    recentActivity.push({
+      id: recentActivity.length + 1,
+      action: 'Profile updated',
+      item: 'Profile information',
+      time: 'Today'
+    });
+  }
+  
+  // If no activity, show placeholder
+  if (recentActivity.length === 0) {
+    recentActivity.push({
+      id: 1,
+      action: 'Welcome!',
+      item: 'Start by adding your first custom link',
+      time: 'Now'
+    });
+  }
 
   const handleAddLink = () => {
-    if (newLink.title && newLink.url) {
-      // In a real app, you would make an API call here
-      console.log('Adding new link:', newLink);
-      setNewLink({ title: '', url: '', description: '' });
-      setIsAddingLink(false);
-    }
+    // Redirect to profile settings links tab
+    navigate('/profile?tab=links');
   };
 
   const renderOverview = () => (
@@ -69,9 +92,19 @@ const Dashboard = () => {
             <Eye size={24} />
           </div>
           <div className="stat-info">
-            <div className="stat-number">{stats.totalViews.toLocaleString()}</div>
-            <div className="stat-label">Total Views</div>
-            <div className="stat-change positive">+12% this week</div>
+            <div className="stat-number">{stats.totalClicks.toLocaleString()}</div>
+            <div className="stat-label">Total Clicks</div>
+            <div className="stat-change positive">All time</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">
+            <Link2 size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-number">{stats.activeLinks}</div>
+            <div className="stat-label">Active Links</div>
+            <div className="stat-change neutral">of {stats.totalLinks} total</div>
           </div>
         </div>
         <div className="stat-card">
@@ -79,19 +112,9 @@ const Dashboard = () => {
             <Users size={24} />
           </div>
           <div className="stat-info">
-            <div className="stat-number">{stats.followers.toLocaleString()}</div>
-            <div className="stat-label">Followers</div>
-            <div className="stat-change positive">+8% this week</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <DollarSign size={24} />
-          </div>
-          <div className="stat-info">
-            <div className="stat-number">${stats.revenue.toLocaleString()}</div>
-            <div className="stat-label">Revenue</div>
-            <div className="stat-change positive">+23% this week</div>
+            <div className="stat-number">{Object.values(profileData.socialLinks || {}).filter(link => link).length}</div>
+            <div className="stat-label">Social Links</div>
+            <div className="stat-change neutral">Connected</div>
           </div>
         </div>
         <div className="stat-card">
@@ -99,9 +122,9 @@ const Dashboard = () => {
             <TrendingUp size={24} />
           </div>
           <div className="stat-info">
-            <div className="stat-number">{stats.clickRate}%</div>
-            <div className="stat-label">Click Rate</div>
-            <div className="stat-change negative">-2% this week</div>
+            <div className="stat-number">{stats.clickRate}</div>
+            <div className="stat-label">Avg Clicks/Link</div>
+            <div className="stat-change neutral">All time</div>
           </div>
         </div>
       </div>
@@ -129,15 +152,28 @@ const Dashboard = () => {
             <h3>Top Performing Links</h3>
           </div>
           <div className="link-performance">
-            {links.slice(0, 3).map(link => (
-              <div key={link.id} className="performance-item">
+            {customLinks.length > 0 ? (
+              customLinks
+                .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+                .slice(0, 3)
+                .map(link => (
+                  <div key={link.id} className="performance-item">
+                    <div className="performance-info">
+                      <div className="performance-title">{link.title}</div>
+                      <div className="performance-url">{link.url}</div>
+                    </div>
+                    <div className="performance-clicks">{link.clicks || 0} clicks</div>
+                  </div>
+                ))
+            ) : (
+              <div className="performance-item">
                 <div className="performance-info">
-                  <div className="performance-title">{link.title}</div>
-                  <div className="performance-url">{link.url}</div>
+                  <div className="performance-title">No links yet</div>
+                  <div className="performance-url">Add your first custom link to get started</div>
                 </div>
-                <div className="performance-clicks">{link.clicks} clicks</div>
+                <div className="performance-clicks">0 clicks</div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -150,93 +186,76 @@ const Dashboard = () => {
         <h2>Manage Links</h2>
         <button 
           className="btn btn-primary"
-          onClick={() => setIsAddingLink(true)}
+          onClick={handleAddLink}
         >
           <Plus size={20} />
           Add Link
         </button>
       </div>
 
-      {isAddingLink && (
-        <div className="add-link-form">
-          <div className="form-group">
-            <label className="form-label">Link Title</label>
-            <input
-              type="text"
-              className="form-input"
-              value={newLink.title}
-              onChange={(e) => setNewLink({...newLink, title: e.target.value})}
-              placeholder="e.g., My YouTube Channel"
-            />
+      {customLinks.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">
+            <Link2 size={48} />
           </div>
-          <div className="form-group">
-            <label className="form-label">URL</label>
-            <input
-              type="url"
-              className="form-input"
-              value={newLink.url}
-              onChange={(e) => setNewLink({...newLink, url: e.target.value})}
-              placeholder="https://example.com"
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Description (Optional)</label>
-            <input
-              type="text"
-              className="form-input"
-              value={newLink.description}
-              onChange={(e) => setNewLink({...newLink, description: e.target.value})}
-              placeholder="Brief description of the link"
-            />
-          </div>
-          <div className="form-actions">
-            <button className="btn btn-primary" onClick={handleAddLink}>
-              Add Link
-            </button>
-            <button 
-              className="btn btn-ghost" 
-              onClick={() => setIsAddingLink(false)}
-            >
-              Cancel
+          <h3>No custom links yet</h3>
+          <p>Create your first custom link to start building your personal landing page</p>
+          <button className="btn btn-primary" onClick={handleAddLink}>
+            <Plus size={20} />
+            Create Your First Link
+          </button>
+        </div>
+      ) : (
+        <div className="links-grid">
+          {customLinks.map(link => (
+            <div key={link.id} className="link-card">
+              <div className="link-header">
+                <div className="link-info">
+                  <h4>{link.title}</h4>
+                  <p>{link.url}</p>
+                  {link.description && (
+                    <small className="link-description">{link.description}</small>
+                  )}
+                </div>
+                <div className="link-actions">
+                  <button 
+                    className="action-btn"
+                    onClick={() => navigate('/profile?tab=links')}
+                    title="Edit"
+                  >
+                    <Edit3 size={16} />
+                  </button>
+                  <button 
+                    className="action-btn"
+                    onClick={() => window.open(link.url, '_blank')}
+                    title="Visit link"
+                  >
+                    <ExternalLink size={16} />
+                  </button>
+                </div>
+              </div>
+              <div className="link-stats">
+                <div className="stat">
+                  <span className="stat-number">{link.clicks || 0}</span>
+                  <span className="stat-label">Clicks</span>
+                </div>
+                <div className="link-status">
+                  <span className={`status ${link.isActive ? 'active' : 'inactive'}`}>
+                    {link.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          <div className="add-link-card">
+            <button className="add-link-btn" onClick={handleAddLink}>
+              <Plus size={32} />
+              <span>Add New Link</span>
             </button>
           </div>
         </div>
       )}
-
-      <div className="links-grid">
-        {links.map(link => (
-          <div key={link.id} className="link-card">
-            <div className="link-header">
-              <div className="link-info">
-                <h4>{link.title}</h4>
-                <p>{link.url}</p>
-              </div>
-              <div className="link-actions">
-                <button className="action-btn">
-                  <Edit3 size={16} />
-                </button>
-                <button className="action-btn">
-                  <ExternalLink size={16} />
-                </button>
-                <button className="action-btn delete">
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-            <div className="link-stats">
-              <div className="stat">
-                <span className="stat-number">{link.clicks}</span>
-                <span className="stat-label">Clicks</span>
-              </div>
-              <div className="link-status">
-                <span className={`status ${link.isActive ? 'active' : 'inactive'}`}>
-                  {link.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 
@@ -332,7 +351,7 @@ const Dashboard = () => {
         <div className="container">
           <div className="header-content">
             <div className="header-info">
-              <h1>Creator Dashboard</h1>
+              <h1>Pivota Dashboard</h1>
               <p>Manage your content, links, and track your performance</p>
             </div>
             <div className="header-actions">
@@ -345,7 +364,10 @@ const Dashboard = () => {
               </button>
               <button 
                 className="btn btn-primary"
-                onClick={() => navigate('/profile/public')}
+                onClick={() => {
+                  const username = profileData.username || 'preview';
+                  navigate(`/u/${username}`);
+                }}
               >
                 <ExternalLink size={20} />
                 View Profile
@@ -372,7 +394,7 @@ const Dashboard = () => {
               <Link2 size={20} />
               Links
             </button>
-            <button 
+            {/* <button 
               className={`nav-tab ${activeTab === 'products' ? 'active' : ''}`}
               onClick={() => setActiveTab('products')}
             >
@@ -385,7 +407,7 @@ const Dashboard = () => {
             >
               <BarChart3 size={20} />
               Analytics
-            </button>
+            </button> */}
           </nav>
         </div>
       </div>
@@ -402,12 +424,12 @@ const Dashboard = () => {
       <style jsx>{`
         .dashboard {
           min-height: 100vh;
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .dashboard-header {
-          background: white;
-          border-bottom: 1px solid #e5e7eb;
+          background: var(--white);
+          border-bottom: 1px solid var(--light-gray);
           padding: 24px 0;
         }
 
@@ -420,12 +442,13 @@ const Dashboard = () => {
         .header-info h1 {
           font-size: 2rem;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 4px;
         }
 
         .header-info p {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
         }
 
         .header-actions {
@@ -434,8 +457,8 @@ const Dashboard = () => {
         }
 
         .dashboard-nav {
-          background: white;
-          border-bottom: 1px solid #e5e7eb;
+          background: var(--white);
+          border-bottom: 1px solid var(--light-gray);
         }
 
         .nav-tabs {
@@ -450,7 +473,8 @@ const Dashboard = () => {
           padding: 16px 0;
           background: none;
           border: none;
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           font-weight: 500;
           cursor: pointer;
           border-bottom: 2px solid transparent;
@@ -458,12 +482,14 @@ const Dashboard = () => {
         }
 
         .nav-tab:hover {
-          color: #374151;
+          color: var(--dark-charcoal);
+          opacity: 1;
         }
 
         .nav-tab.active {
-          color: #667eea;
-          border-bottom-color: #667eea;
+          color: var(--electric-blue);
+          opacity: 1;
+          border-bottom-color: var(--electric-blue);
         }
 
         .dashboard-content {
@@ -480,7 +506,7 @@ const Dashboard = () => {
         .section-header h2 {
           font-size: 1.5rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
         }
 
         .stats-grid {
@@ -491,10 +517,10 @@ const Dashboard = () => {
         }
 
         .stat-card {
-          background: white;
+          background: var(--white);
           border-radius: 12px;
           padding: 24px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--light-gray);
           display: flex;
           align-items: center;
           gap: 16px;
@@ -503,23 +529,24 @@ const Dashboard = () => {
         .stat-icon {
           width: 48px;
           height: 48px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--primary-gradient);
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: var(--white);
         }
 
         .stat-number {
           font-size: 1.875rem;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 4px;
         }
 
         .stat-label {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           font-size: 0.875rem;
           margin-bottom: 4px;
         }
@@ -530,11 +557,16 @@ const Dashboard = () => {
         }
 
         .stat-change.positive {
-          color: #10b981;
+          color: var(--soft-teal);
         }
 
         .stat-change.negative {
-          color: #ef4444;
+          color: var(--vibrant-coral);
+        }
+
+        .stat-change.neutral {
+          color: var(--dark-charcoal);
+          opacity: 0.7;
         }
 
         .dashboard-grid {
@@ -544,9 +576,9 @@ const Dashboard = () => {
         }
 
         .dashboard-card {
-          background: white;
+          background: var(--white);
           border-radius: 12px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--light-gray);
           overflow: hidden;
         }
 
@@ -557,7 +589,7 @@ const Dashboard = () => {
         .card-header h3 {
           font-size: 1.125rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
         }
 
         .activity-list {
@@ -618,15 +650,15 @@ const Dashboard = () => {
         }
 
         .performance-clicks {
-          color: #667eea;
+          color: var(--electric-blue);
           font-weight: 600;
         }
 
         .add-link-form {
-          background: white;
+          background: var(--white);
           border-radius: 12px;
           padding: 24px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--light-gray);
           margin-bottom: 24px;
         }
 
@@ -643,10 +675,10 @@ const Dashboard = () => {
         }
 
         .link-card {
-          background: white;
+          background: var(--white);
           border-radius: 12px;
           padding: 24px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--light-gray);
         }
 
         .link-header {
@@ -658,12 +690,13 @@ const Dashboard = () => {
 
         .link-info h4 {
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 4px;
         }
 
         .link-info p {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           font-size: 0.875rem;
         }
 
@@ -681,19 +714,21 @@ const Dashboard = () => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          background: #f3f4f6;
-          color: #6b7280;
+          background: var(--light-gray);
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           transition: all 0.3s ease;
         }
 
         .action-btn:hover {
-          background: #e5e7eb;
-          color: #374151;
+          background: var(--soft-teal);
+          color: var(--white);
+          opacity: 1;
         }
 
         .action-btn.delete:hover {
-          background: #fef2f2;
-          color: #dc2626;
+          background: var(--vibrant-coral);
+          color: var(--white);
         }
 
         .link-stats {
@@ -724,13 +759,83 @@ const Dashboard = () => {
         }
 
         .status.active {
-          background: #d1fae5;
-          color: #047857;
+          background: rgba(78, 205, 196, 0.2);
+          color: var(--soft-teal);
         }
 
         .status.inactive {
-          background: #fee2e2;
-          color: #dc2626;
+          background: rgba(255, 107, 107, 0.2);
+          color: var(--vibrant-coral);
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 64px 32px;
+          background: var(--white);
+          border-radius: 12px;
+          border: 2px dashed var(--light-gray);
+        }
+
+        .empty-icon {
+          color: #9ca3af;
+          margin-bottom: 24px;
+        }
+
+        .empty-state h3 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--dark-charcoal);
+          margin-bottom: 12px;
+        }
+
+        .empty-state p {
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+          margin-bottom: 24px;
+          max-width: 400px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .add-link-card {
+          background: var(--white);
+          border: 2px dashed var(--light-gray);
+          border-radius: 12px;
+          padding: 24px;
+          transition: all 0.3s ease;
+        }
+
+        .add-link-card:hover {
+          border-color: var(--electric-blue);
+          background: var(--light-gray);
+        }
+
+        .add-link-btn {
+          width: 100%;
+          background: none;
+          border: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          color: #6b7280;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .add-link-btn:hover {
+          color: var(--electric-blue);
+        }
+
+        .add-link-btn span {
+          font-weight: 500;
+        }
+
+        .link-description {
+          color: #9ca3af;
+          font-size: 0.8rem;
+          margin-top: 4px;
+          display: block;
         }
 
         .products-grid {
@@ -740,10 +845,10 @@ const Dashboard = () => {
         }
 
         .product-card {
-          background: white;
+          background: var(--white);
           border-radius: 12px;
           padding: 24px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--light-gray);
           text-align: center;
         }
 
@@ -757,14 +862,14 @@ const Dashboard = () => {
 
         .product-info h4 {
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 8px;
         }
 
         .product-price {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #667eea;
+          color: var(--electric-blue);
           margin-bottom: 16px;
         }
 
@@ -803,16 +908,16 @@ const Dashboard = () => {
         }
 
         .analytics-card {
-          background: white;
+          background: var(--white);
           border-radius: 12px;
           padding: 24px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--light-gray);
         }
 
         .analytics-card h3 {
           font-size: 1.125rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 20px;
         }
 

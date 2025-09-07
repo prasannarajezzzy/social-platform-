@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   User, 
   Upload, 
@@ -29,6 +29,7 @@ import { useProfile } from '../contexts/ProfileContext';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { 
     profileData, 
     appearanceData, 
@@ -44,6 +45,14 @@ const ProfilePage = () => {
   } = useProfile();
   
   const [activeTab, setActiveTab] = useState('profile');
+
+  // Handle URL parameters for tab switching
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['profile', 'links', 'appearance'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
   const [previewMode, setPreviewMode] = useState(false);
   const [showAddLinkForm, setShowAddLinkForm] = useState(false);
   const [editingLink, setEditingLink] = useState(null);
@@ -254,6 +263,18 @@ const ProfilePage = () => {
               </button>
             )}
           </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Username</label>
+          <input
+            type="text"
+            className="form-input"
+            value={profileData.username}
+            onChange={(e) => handleProfileChange('username', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+            placeholder="e.g., johndoe"
+          />
+          <small className="form-help">Your profile will be available at: {window.location.origin}/u/{profileData.username || 'username'}</small>
         </div>
 
         <div className="form-group">
@@ -800,7 +821,7 @@ const ProfilePage = () => {
       <style jsx>{`
         .profile-page {
           min-height: 100vh;
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .profile-header {
@@ -881,8 +902,8 @@ const ProfilePage = () => {
         }
 
         .nav-tab.active {
-          color: #667eea;
-          border-bottom-color: #667eea;
+          color: var(--electric-blue);
+          border-bottom-color: var(--electric-blue);
         }
 
         .profile-content-wrapper {
@@ -982,6 +1003,13 @@ const ProfilePage = () => {
           outline: none;
           border-color: #667eea;
           box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-help {
+          display: block;
+          font-size: 0.875rem;
+          color: #6b7280;
+          margin-top: 4px;
         }
 
         .code-textarea {
@@ -1411,8 +1439,8 @@ const ProfilePage = () => {
         .link-icon {
           width: 48px;
           height: 48px;
-          background: #667eea;
-          color: white;
+          background: var(--electric-blue);
+          color: var(--white);
           border-radius: 12px;
           display: flex;
           align-items: center;
@@ -1434,7 +1462,7 @@ const ProfilePage = () => {
 
         .link-url {
           font-size: 0.9rem;
-          color: #667eea;
+          color: var(--electric-blue);
           margin-bottom: 4px;
           word-break: break-all;
         }

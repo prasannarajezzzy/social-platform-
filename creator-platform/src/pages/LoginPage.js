@@ -80,7 +80,7 @@ const LoginPage = () => {
               <div className="form-header">
                 <h1 className="form-title">Welcome Back</h1>
                 <p className="form-subtitle">
-                  Sign in to your CreatorHub account
+                  Sign in to your Pivota account
                 </p>
               </div>
 
@@ -204,7 +204,7 @@ const LoginPage = () => {
             <div className="visual-content">
               <h2 className="visual-title">Join the Creator Revolution</h2>
               <p className="visual-description">
-                Over 10,000 creators trust CreatorHub to grow their business and connect with their audience.
+                Over 10,000 creators trust Pivota to grow their business and connect with their audience.
               </p>
               <div className="visual-features">
                 <div className="visual-feature">
@@ -228,7 +228,7 @@ const LoginPage = () => {
       <style jsx>{`
         .login-page {
           min-height: 100vh;
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .login-container {
@@ -240,9 +240,9 @@ const LoginPage = () => {
         }
 
         .login-content {
-          background: white;
+          background: var(--white);
           border-radius: 16px;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 20px 50px rgba(44, 44, 44, 0.1);
           overflow: hidden;
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -267,7 +267,7 @@ const LoginPage = () => {
         .form-title {
           font-size: 2rem;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 8px;
         }
 
@@ -282,11 +282,11 @@ const LoginPage = () => {
         }
 
         .error-banner {
-          background: #fef2f2;
-          color: #dc2626;
+          background: rgba(255, 107, 107, 0.1);
+          color: var(--vibrant-coral);
           padding: 12px 16px;
           border-radius: 8px;
-          border: 1px solid #fecaca;
+          border: 1px solid var(--vibrant-coral);
           margin-bottom: 24px;
           font-size: 14px;
         }
@@ -309,8 +309,8 @@ const LoginPage = () => {
         }
 
         .form-input.error {
-          border-color: #dc2626;
-          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+          border-color: var(--vibrant-coral);
+          box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
         }
 
         .password-toggle {
@@ -330,7 +330,7 @@ const LoginPage = () => {
         }
 
         .error-message {
-          color: #dc2626;
+          color: var(--vibrant-coral);
           font-size: 14px;
           margin-top: 4px;
           display: block;
@@ -356,7 +356,7 @@ const LoginPage = () => {
         }
 
         .forgot-link {
-          color: #667eea;
+          color: var(--electric-blue);
           text-decoration: none;
           font-size: 14px;
           font-weight: 500;
@@ -451,7 +451,7 @@ const LoginPage = () => {
         }
 
         .signup-link {
-          color: #667eea;
+          color: var(--electric-blue);
           text-decoration: none;
           font-weight: 500;
         }
@@ -461,8 +461,8 @@ const LoginPage = () => {
         }
 
         .login-visual-section {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--primary-gradient);
+          color: var(--white);
           padding: 60px 50px;
           display: flex;
           align-items: center;

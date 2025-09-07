@@ -109,7 +109,7 @@ const AboutUs = () => {
             </h1>
             <p className="hero-subtitle">
               We believe every creator deserves the tools and support to turn their passion 
-              into a thriving business. CreatorHub is more than a platform—it's your 
+              into a thriving business. Pivota is more than a platform—it's your 
               launchpad to success.
             </p>
             <div className="hero-stats">
@@ -142,7 +142,7 @@ const AboutUs = () => {
                 audiences, and monetize their passion.
               </p>
               <p className="mission-description">
-                We started CreatorHub because we saw talented creators struggling with 
+                We started Pivota because we saw talented creators struggling with 
                 fragmented tools, complex setups, and platforms that didn't put creators first. 
                 We knew there had to be a better way.
               </p>
@@ -239,7 +239,7 @@ const AboutUs = () => {
         <div className="container">
           <div className="features-content">
             <div className="features-text">
-              <h2 className="section-title">Why Creators Choose CreatorHub</h2>
+              <h2 className="section-title">Why Creators Choose Pivota</h2>
               <p className="features-description">
                 We've built everything you need to succeed as a creator, 
                 all in one powerful platform.
@@ -294,7 +294,7 @@ const AboutUs = () => {
           <div className="cta-content">
             <h2 className="cta-title">Ready to Start Your Creator Journey?</h2>
             <p className="cta-subtitle">
-              Join thousands of creators who are already building their digital empire with CreatorHub
+              Join thousands of creators who are already building their digital empire with Pivota
             </p>
             <div className="cta-buttons">
               <Link to="/register" className="btn btn-primary">
@@ -314,8 +314,8 @@ const AboutUs = () => {
         }
 
         .hero {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--primary-gradient);
+          color: var(--white);
           padding: 80px 0;
         }
 
@@ -362,7 +362,7 @@ const AboutUs = () => {
         }
 
         .mission {
-          background: white;
+          background: var(--white);
         }
 
         .mission-content {
@@ -375,14 +375,15 @@ const AboutUs = () => {
         .section-title {
           font-size: 2.5rem;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 24px;
         }
 
         .mission-description {
           font-size: 1.125rem;
           line-height: 1.7;
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           margin-bottom: 24px;
         }
 
@@ -395,16 +396,16 @@ const AboutUs = () => {
         .mission-icon {
           width: 120px;
           height: 120px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--primary-gradient);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: var(--white);
         }
 
         .values {
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .section-header {
@@ -414,7 +415,8 @@ const AboutUs = () => {
 
         .section-subtitle {
           font-size: 1.125rem;
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
         }
 
         .values-grid {
@@ -424,45 +426,46 @@ const AboutUs = () => {
         }
 
         .value-card {
-          background: white;
+          background: var(--white);
           padding: 40px 32px;
           border-radius: 16px;
           text-align: center;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 6px -1px var(--shadow-light);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .value-card:hover {
           transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 20px 40px var(--shadow-medium);
         }
 
         .value-icon {
           width: 80px;
           height: 80px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--coral-gradient);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 24px;
-          color: white;
+          color: var(--white);
         }
 
         .value-title {
           font-size: 1.5rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 16px;
         }
 
         .value-description {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           line-height: 1.6;
         }
 
         .team {
-          background: white;
+          background: var(--white);
         }
 
         .team-grid {
@@ -472,7 +475,7 @@ const AboutUs = () => {
         }
 
         .team-card {
-          background: #f8fafc;
+          background: var(--light-gray);
           border-radius: 16px;
           padding: 32px;
           text-align: center;
@@ -494,23 +497,24 @@ const AboutUs = () => {
         .team-name {
           font-size: 1.25rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 8px;
         }
 
         .team-role {
-          color: #667eea;
+          color: var(--electric-blue);
           font-weight: 500;
           margin-bottom: 16px;
         }
 
         .team-bio {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           line-height: 1.6;
         }
 
         .journey {
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .timeline {
@@ -526,7 +530,7 @@ const AboutUs = () => {
           top: 0;
           bottom: 0;
           width: 2px;
-          background: #e5e7eb;
+          background: var(--border-primary);
           transform: translateX(-50%);
         }
 
@@ -551,22 +555,22 @@ const AboutUs = () => {
         .timeline-dot {
           width: 16px;
           height: 16px;
-          background: #667eea;
+          background: var(--electric-blue);
           border-radius: 50%;
-          border: 4px solid white;
-          box-shadow: 0 0 0 4px #e5e7eb;
+          border: 4px solid var(--white);
+          box-shadow: 0 0 0 4px var(--border-primary);
         }
 
         .timeline-content {
           width: 45%;
           padding: 24px;
-          background: white;
+          background: var(--white);
           border-radius: 12px;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 6px -1px var(--shadow-light);
         }
 
         .timeline-year {
-          color: #667eea;
+          color: var(--electric-blue);
           font-weight: 700;
           font-size: 1.125rem;
           margin-bottom: 8px;
@@ -575,17 +579,18 @@ const AboutUs = () => {
         .timeline-title {
           font-size: 1.25rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 8px;
         }
 
         .timeline-description {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           line-height: 1.6;
         }
 
         .features {
-          background: white;
+          background: var(--white);
         }
 
         .features-content {
@@ -597,7 +602,8 @@ const AboutUs = () => {
 
         .features-description {
           font-size: 1.125rem;
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           line-height: 1.7;
           margin-bottom: 32px;
         }
@@ -611,11 +617,11 @@ const AboutUs = () => {
           display: flex;
           align-items: center;
           gap: 12px;
-          color: #374151;
+          color: var(--dark-charcoal);
         }
 
         .feature-item svg {
-          color: #10b981;
+          color: var(--soft-teal);
           flex-shrink: 0;
         }
 
@@ -626,40 +632,41 @@ const AboutUs = () => {
         }
 
         .stats-card {
-          background: #f8fafc;
+          background: var(--light-gray);
           border-radius: 12px;
           padding: 24px;
           display: flex;
           align-items: center;
           gap: 16px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--border-primary);
         }
 
         .stats-icon {
           width: 48px;
           height: 48px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--teal-gradient);
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: var(--white);
         }
 
         .stats-number {
           font-size: 1.875rem;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--dark-charcoal);
         }
 
         .stats-label {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           font-size: 0.875rem;
         }
 
         .cta {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--teal-gradient);
+          color: var(--white);
         }
 
         .cta-content {

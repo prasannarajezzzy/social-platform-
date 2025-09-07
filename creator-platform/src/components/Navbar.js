@@ -35,7 +35,7 @@ const Navbar = () => {
       <div className="container">
         <div className="nav-content">
           <Link to="/" className="nav-logo">
-            <span className="logo-text">CreatorHub</span>
+            <span className="logo-text">Pivota</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -126,8 +126,8 @@ const Navbar = () => {
 
       <style jsx>{`
         .navbar {
-          background: white;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          background: var(--white);
+          box-shadow: 0 2px 10px rgba(44, 44, 44, 0.1);
           position: sticky;
           top: 0;
           z-index: 1000;
@@ -147,7 +147,7 @@ const Navbar = () => {
         .logo-text {
           font-size: 24px;
           font-weight: 700;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--primary-gradient);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -160,18 +160,21 @@ const Navbar = () => {
 
         .nav-link {
           text-decoration: none;
-          color: #64748b;
+          color: var(--dark-charcoal);
           font-weight: 500;
           transition: color 0.3s ease;
           position: relative;
+          opacity: 0.7;
         }
 
         .nav-link:hover {
-          color: #667eea;
+          color: var(--electric-blue);
+          opacity: 1;
         }
 
         .nav-link.active {
-          color: #667eea;
+          color: var(--electric-blue);
+          opacity: 1;
         }
 
         .nav-link.active::after {
@@ -181,7 +184,7 @@ const Navbar = () => {
           left: 0;
           right: 0;
           height: 2px;
-          background: #667eea;
+          background: var(--electric-blue);
           border-radius: 1px;
         }
 
@@ -202,7 +205,7 @@ const Navbar = () => {
           background: none;
           border: none;
           cursor: pointer;
-          color: #64748b;
+          color: var(--dark-charcoal);
         }
 
         .mobile-nav {
@@ -217,14 +220,14 @@ const Navbar = () => {
 
         .mobile-nav-links {
           padding: 20px 0;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--light-gray);
         }
 
         .mobile-nav-link {
           display: block;
           padding: 12px 0;
           text-decoration: none;
-          color: #64748b;
+          color: var(--dark-charcoal);
           font-weight: 500;
           border: none;
           background: none;
@@ -234,14 +237,17 @@ const Navbar = () => {
           display: flex;
           align-items: center;
           gap: 8px;
+          opacity: 0.7;
         }
 
         .mobile-nav-link:hover {
-          color: #667eea;
+          color: var(--electric-blue);
+          opacity: 1;
         }
 
         .mobile-nav-link.active {
-          color: #667eea;
+          color: var(--electric-blue);
+          opacity: 1;
         }
 
         .mobile-nav-btn {

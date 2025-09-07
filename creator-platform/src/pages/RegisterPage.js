@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle, XCircle, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useProfile } from '../contexts/ProfileContext';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 const RegisterPage = () => {
@@ -9,6 +10,7 @@ const RegisterPage = () => {
     firstName: '',
     lastName: '',
     email: '',
+    username: '',
     password: '',
     confirmPassword: '',
     agreeToTerms: false
@@ -17,18 +19,87 @@ const RegisterPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState('idle'); // 'idle', 'checking', 'available', 'taken'
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
+  const { updateProfile } = useProfile();
   
   // Redirect if already authenticated
   useAuthRedirect();
 
+  // Mock list of taken usernames (in real app, this would be an API call)
+  const takenUsernames = ['admin', 'user', 'test', 'demo', 'api', 'www', 'app', 'mobile', 'web', 'support', 'help', 'blog', 'news', 'about', 'contact', 'privacy', 'terms', 'login', 'register', 'signup', 'signin', 'profile', 'settings', 'dashboard', 'home', 'index'];
+
+  // Username availability checker
+  const checkUsernameAvailability = useCallback(async (username) => {
+    if (!username || username.length < 3) {
+      return { available: false, message: '' };
+    }
+
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Check if username is taken
+    const isTaken = takenUsernames.includes(username.toLowerCase());
+    
+    return {
+      available: !isTaken,
+      message: isTaken ? 'Username is already taken' : 'Username is available'
+    };
+  }, []);
+
+  // Debounced username check
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      if (formData.username && formData.username.length >= 3) {
+        setIsCheckingUsername(true);
+        setUsernameStatus('checking');
+        
+        try {
+          const result = await checkUsernameAvailability(formData.username);
+          setUsernameStatus(result.available ? 'available' : 'taken');
+          
+          if (!result.available) {
+            setErrors(prev => ({
+              ...prev,
+              username: result.message
+            }));
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              username: ''
+            }));
+          }
+        } catch (error) {
+          setUsernameStatus('idle');
+        } finally {
+          setIsCheckingUsername(false);
+        }
+      } else {
+        setUsernameStatus('idle');
+        setIsCheckingUsername(false);
+      }
+    }, 800); // 800ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.username, checkUsernameAvailability]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    let processedValue = value;
+    
+    // Format username: lowercase, alphanumeric and underscores only
+    if (name === 'username') {
+      processedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : processedValue
     }));
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -53,6 +124,20 @@ const RegisterPage = () => {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
+    }
+
+    if (!formData.username) {
+      newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+    } else if (formData.username.length > 20) {
+      newErrors.username = 'Username must be less than 20 characters';
+    } else if (!/^[a-z0-9_]+$/.test(formData.username)) {
+      newErrors.username = 'Username can only contain lowercase letters, numbers, and underscores';
+    } else if (usernameStatus === 'taken') {
+      newErrors.username = 'Username is already taken';
+    } else if (usernameStatus !== 'available') {
+      newErrors.username = 'Please wait for username availability check';
     }
 
     if (!formData.password) {
@@ -88,6 +173,13 @@ const RegisterPage = () => {
 
     try {
       await signup(formData);
+      
+      // Set the username in the profile context
+      await updateProfile({
+        username: formData.username,
+        title: `${formData.firstName} ${formData.lastName}`.trim()
+      });
+      
       navigate('/dashboard');
     } catch (error) {
       setErrors({ general: error.message || 'Registration failed. Please try again.' });
@@ -121,7 +213,7 @@ const RegisterPage = () => {
             <div className="visual-content">
               <h2 className="visual-title">Start Your Creator Journey</h2>
               <p className="visual-description">
-                Join over 10,000 creators who are building their brand and growing their business with CreatorHub.
+                Join over 10,000 creators who are building their brand and growing their business with Pivota.
               </p>
               <div className="visual-stats">
                 <div className="stat">
@@ -218,6 +310,45 @@ const RegisterPage = () => {
                   </div>
                   {errors.email && (
                     <span className="error-message">{errors.email}</span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="username" className="form-label">
+                    Username
+                  </label>
+                  <div className="input-wrapper">
+                    <User className="input-icon" size={20} />
+                    <input
+                      type="text"
+                      id="username"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className={`form-input ${errors.username ? 'error' : usernameStatus === 'available' ? 'success' : ''}`}
+                      placeholder="Choose a username"
+                      maxLength={20}
+                    />
+                    <div className="username-status">
+                      {isCheckingUsername && (
+                        <Loader className="status-icon checking" size={20} />
+                      )}
+                      {usernameStatus === 'available' && !isCheckingUsername && (
+                        <CheckCircle className="status-icon available" size={20} />
+                      )}
+                      {usernameStatus === 'taken' && !isCheckingUsername && (
+                        <XCircle className="status-icon taken" size={20} />
+                      )}
+                    </div>
+                  </div>
+                  <div className="username-help">
+                    Your profile will be available at: yoursite.com/u/{formData.username || 'username'}
+                  </div>
+                  {usernameStatus === 'available' && !errors.username && (
+                    <span className="success-message">✓ Username is available</span>
+                  )}
+                  {errors.username && (
+                    <span className="error-message">{errors.username}</span>
                   )}
                 </div>
 
@@ -366,7 +497,7 @@ const RegisterPage = () => {
       <style jsx>{`
         .register-page {
           min-height: 100vh;
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .register-container {
@@ -378,9 +509,9 @@ const RegisterPage = () => {
         }
 
         .register-content {
-          background: white;
+          background: var(--white);
           border-radius: 16px;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 20px 50px rgba(44, 44, 44, 0.1);
           overflow: hidden;
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -389,8 +520,8 @@ const RegisterPage = () => {
         }
 
         .register-visual-section {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--primary-gradient);
+          color: var(--white);
           padding: 60px 50px;
           display: flex;
           align-items: center;
@@ -456,7 +587,7 @@ const RegisterPage = () => {
         .form-title {
           font-size: 2rem;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--dark-charcoal);
           margin-bottom: 8px;
         }
 
@@ -471,11 +602,11 @@ const RegisterPage = () => {
         }
 
         .error-banner {
-          background: #fef2f2;
-          color: #dc2626;
+          background: rgba(255, 107, 107, 0.1);
+          color: var(--vibrant-coral);
           padding: 12px 16px;
           border-radius: 8px;
-          border: 1px solid #fecaca;
+          border: 1px solid var(--vibrant-coral);
           margin-bottom: 24px;
           font-size: 14px;
         }
@@ -504,8 +635,13 @@ const RegisterPage = () => {
         }
 
         .form-input.error {
-          border-color: #dc2626;
-          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+          border-color: var(--vibrant-coral);
+          box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-input.success {
+          border-color: var(--soft-teal);
+          box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
         }
 
         .password-toggle {
@@ -545,11 +681,11 @@ const RegisterPage = () => {
           transition: all 0.3s ease;
         }
 
-        .strength-fill.strength-1 { background: #dc2626; }
-        .strength-fill.strength-2 { background: #ea580c; }
-        .strength-fill.strength-3 { background: #ca8a04; }
-        .strength-fill.strength-4 { background: #16a34a; }
-        .strength-fill.strength-5 { background: #059669; }
+        .strength-fill.strength-1 { background: var(--vibrant-coral); }
+        .strength-fill.strength-2 { background: var(--sunset-orange); }
+        .strength-fill.strength-3 { background: var(--muted-gold); }
+        .strength-fill.strength-4 { background: var(--soft-teal); }
+        .strength-fill.strength-5 { background: var(--electric-blue); }
 
         .strength-label {
           font-size: 12px;
@@ -557,17 +693,56 @@ const RegisterPage = () => {
           min-width: 70px;
         }
 
-        .strength-label.strength-1 { color: #dc2626; }
-        .strength-label.strength-2 { color: #ea580c; }
-        .strength-label.strength-3 { color: #ca8a04; }
-        .strength-label.strength-4 { color: #16a34a; }
-        .strength-label.strength-5 { color: #059669; }
+        .strength-label.strength-1 { color: var(--vibrant-coral); }
+        .strength-label.strength-2 { color: var(--sunset-orange); }
+        .strength-label.strength-3 { color: var(--muted-gold); }
+        .strength-label.strength-4 { color: var(--soft-teal); }
+        .strength-label.strength-5 { color: var(--electric-blue); }
 
         .error-message {
-          color: #dc2626;
+          color: var(--vibrant-coral);
           font-size: 14px;
           margin-top: 4px;
           display: block;
+        }
+
+        .success-message {
+          color: var(--soft-teal);
+          font-size: 14px;
+          margin-top: 4px;
+          display: block;
+          font-weight: 500;
+        }
+
+        .username-status {
+          position: absolute;
+          right: 12px;
+          display: flex;
+          align-items: center;
+        }
+
+        .status-icon {
+          padding: 4px;
+        }
+
+        .status-icon.checking {
+          color: #6b7280;
+          animation: spin 1s linear infinite;
+        }
+
+        .status-icon.available {
+          color: #10b981;
+        }
+
+        .status-icon.taken {
+          color: #dc2626;
+        }
+
+        .username-help {
+          font-size: 12px;
+          color: #6b7280;
+          margin-top: 4px;
+          font-family: monospace;
         }
 
         .checkbox-label {
@@ -589,7 +764,7 @@ const RegisterPage = () => {
         }
 
         .terms-link {
-          color: #667eea;
+          color: var(--electric-blue);
           text-decoration: none;
           font-weight: 500;
         }
@@ -683,7 +858,7 @@ const RegisterPage = () => {
         }
 
         .login-link {
-          color: #667eea;
+          color: var(--electric-blue);
           text-decoration: none;
           font-weight: 500;
         }

@@ -51,7 +51,7 @@ const LandingPage = () => {
     {
       name: 'Sarah Johnson',
       role: 'Lifestyle Influencer',
-      content: 'CreatorHub transformed how I connect with my audience. Sales increased by 300%!',
+      content: 'Pivota transformed how I connect with my audience. Sales increased by 300%!',
       rating: 5
     },
     {
@@ -265,8 +265,8 @@ const LandingPage = () => {
         }
 
         .hero {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--primary-gradient);
+          color: var(--white);
           padding: 80px 0;
           overflow: hidden;
         }
@@ -413,43 +413,44 @@ const LandingPage = () => {
         .feature-icon {
           width: 80px;
           height: 80px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--coral-gradient);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 24px;
-          color: white;
+          color: var(--white);
         }
 
         .feature-title {
           font-size: 1.5rem;
           font-weight: 600;
           margin-bottom: 16px;
-          color: #1f2937;
+          color: var(--dark-charcoal);
         }
 
         .feature-description {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
           line-height: 1.6;
         }
 
         .testimonials {
-          background: #f8fafc;
+          background: var(--light-gray);
         }
 
         .testimonial-card {
-          background: white;
+          background: var(--white);
           padding: 32px;
           border-radius: 12px;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 6px -1px rgba(44, 44, 44, 0.1);
           height: 100%;
         }
 
         .testimonial-rating {
           display: flex;
           gap: 4px;
-          color: #fbbf24;
+          color: var(--muted-gold);
           margin-bottom: 16px;
         }
 
@@ -457,21 +458,22 @@ const LandingPage = () => {
           font-size: 1.125rem;
           line-height: 1.6;
           margin-bottom: 24px;
-          color: #374151;
+          color: var(--dark-charcoal);
         }
 
         .author-name {
           font-weight: 600;
-          color: #1f2937;
+          color: var(--dark-charcoal);
         }
 
         .author-role {
-          color: #6b7280;
+          color: var(--dark-charcoal);
+          opacity: 0.6;
           font-size: 0.875rem;
         }
 
         .pricing {
-          background: white;
+          background: var(--white);
         }
 
         .pricing-grid {
@@ -483,8 +485,8 @@ const LandingPage = () => {
         }
 
         .pricing-card {
-          background: white;
-          border: 2px solid #e5e7eb;
+          background: var(--white);
+          border: 2px solid var(--light-gray);
           border-radius: 12px;
           padding: 40px 32px;
           position: relative;
@@ -498,7 +500,7 @@ const LandingPage = () => {
         }
 
         .pricing-card.popular {
-          border-color: #667eea;
+          border-color: var(--electric-blue);
           transform: scale(1.05);
         }
 
@@ -507,8 +509,8 @@ const LandingPage = () => {
           top: -12px;
           left: 50%;
           transform: translateX(-50%);
-          background: #667eea;
-          color: white;
+          background: var(--electric-blue);
+          color: var(--white);
           padding: 8px 24px;
           border-radius: 20px;
           font-size: 0.875rem;
@@ -519,13 +521,13 @@ const LandingPage = () => {
           font-size: 1.5rem;
           font-weight: 600;
           margin-bottom: 8px;
-          color: #1f2937;
+          color: var(--dark-charcoal);
         }
 
         .plan-price {
           font-size: 2.5rem;
           font-weight: 700;
-          color: #667eea;
+          color: var(--electric-blue);
           margin-bottom: 32px;
         }
 
@@ -540,11 +542,11 @@ const LandingPage = () => {
           align-items: center;
           gap: 12px;
           padding: 8px 0;
-          color: #374151;
+          color: var(--dark-charcoal);
         }
 
         .plan-feature svg {
-          color: #10b981;
+          color: var(--soft-teal);
           flex-shrink: 0;
         }
 
@@ -553,8 +555,8 @@ const LandingPage = () => {
         }
 
         .cta {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--teal-gradient);
+          color: var(--white);
         }
 
         .cta-content {

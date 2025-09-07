@@ -18,9 +18,12 @@ import { useProfile } from '../contexts/ProfileContext';
 
 const PublicProfile = () => {
   const { username } = useParams();
-  const { profileData, appearanceData, getThemeStyles, getFontFamily, getButtonStyles } = useProfile();
+  const { profileData, appearanceData, getThemeStyles, getFontFamily, getButtonStyles, trackLinkClick } = useProfile();
   const [isFollowing, setIsFollowing] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+
+  // For now, we'll display the current user's profile regardless of username
+  // In a real app, you'd fetch the profile data based on the username parameter
 
   const themeStyles = getThemeStyles();
   const fontFamily = getFontFamily();
@@ -61,8 +64,9 @@ const PublicProfile = () => {
   };
 
   const handleLinkClick = (link) => {
-    // Track click analytics
+    // Track click analytics and increment counter
     console.log(`Link clicked: ${link.title}`);
+    trackLinkClick(link.id);
     window.open(link.url, '_blank', 'noopener,noreferrer');
   };
 

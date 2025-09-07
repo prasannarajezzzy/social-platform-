@@ -40,8 +40,8 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/profile/public" element={<PublicProfile />} />
               <Route path="/u/:username" element={<PublicProfile />} />
+              <Route path="/profile/public" element={<PublicProfile />} />
               <Route path="/about" element={<AboutUs />} />
             </Routes>
           </div>

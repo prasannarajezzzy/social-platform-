@@ -1,0 +1,257 @@
+/* ====================================
+   CREATOR PLATFORM THEME
+   Color System & Design Tokens
+   ==================================== */
+
+:root {
+  /* ====================================
+     PRIMARY COLORS
+     Main brand colors for core UI elements
+     ==================================== */
+  --electric-blue: #0066FF;
+  --dark-charcoal: #2C2C2C;
+  --white: #FFFFFF;
+
+  /* ====================================
+     SECONDARY COLORS
+     Supporting brand colors for accents
+     ==================================== */
+  --vibrant-coral: #FF6B6B;
+  --soft-teal: #4ECDC4;
+
+  /* ====================================
+     NEUTRAL TONES
+     Background and subtle UI elements
+     ==================================== */
+  --light-gray: #F5F5F5;
+  --muted-gold: #D4AF37;
+
+  /* ====================================
+     ACCENT COLORS
+     Highlight and interactive states
+     ==================================== */
+  --sunset-orange: #FF8C42;
+  --light-sky-blue: #87CEEB;
+
+  /* ====================================
+     GRADIENT DEFINITIONS
+     Pre-defined color combinations
+     ==================================== */
+  --primary-gradient: linear-gradient(135deg, var(--electric-blue) 0%, var(--light-sky-blue) 100%);
+  --coral-gradient: linear-gradient(135deg, var(--vibrant-coral) 0%, var(--sunset-orange) 100%);
+  --teal-gradient: linear-gradient(135deg, var(--soft-teal) 0%, var(--light-sky-blue) 100%);
+  --gold-gradient: linear-gradient(135deg, var(--muted-gold) 0%, var(--sunset-orange) 100%);
+
+  /* ====================================
+     SEMANTIC COLORS
+     Context-based color meanings
+     ==================================== */
+  
+  /* Success States */
+  --success-color: var(--soft-teal);
+  --success-bg: rgba(78, 205, 196, 0.1);
+  --success-border: var(--soft-teal);
+
+  /* Error States */
+  --error-color: var(--vibrant-coral);
+  --error-bg: rgba(255, 107, 107, 0.1);
+  --error-border: var(--vibrant-coral);
+
+  /* Warning States */
+  --warning-color: var(--sunset-orange);
+  --warning-bg: rgba(255, 140, 66, 0.1);
+  --warning-border: var(--sunset-orange);
+
+  /* Info States */
+  --info-color: var(--electric-blue);
+  --info-bg: rgba(0, 102, 255, 0.1);
+  --info-border: var(--electric-blue);
+
+  /* ====================================
+     TEXT COLORS
+     Typography color hierarchy
+     ==================================== */
+  --text-primary: var(--dark-charcoal);
+  --text-secondary: var(--dark-charcoal);
+  --text-muted: var(--dark-charcoal);
+  --text-disabled: var(--dark-charcoal);
+  --text-inverse: var(--white);
+  --text-link: var(--electric-blue);
+  --text-link-hover: var(--light-sky-blue);
+
+  /* Text opacity modifiers */
+  --text-opacity-high: 1;
+  --text-opacity-medium: 0.7;
+  --text-opacity-low: 0.5;
+  --text-opacity-disabled: 0.3;
+
+  /* ====================================
+     BACKGROUND COLORS
+     Surface and container backgrounds
+     ==================================== */
+  --bg-primary: var(--white);
+  --bg-secondary: var(--light-gray);
+  --bg-tertiary: var(--dark-charcoal);
+  --bg-overlay: rgba(44, 44, 44, 0.5);
+  --bg-glass: rgba(255, 255, 255, 0.1);
+
+  /* ====================================
+     BORDER COLORS
+     Dividers and container outlines
+     ==================================== */
+  --border-primary: var(--light-gray);
+  --border-secondary: var(--electric-blue);
+  --border-accent: var(--soft-teal);
+  --border-error: var(--vibrant-coral);
+  --border-success: var(--soft-teal);
+
+  /* ====================================
+     SHADOW COLORS
+     Depth and elevation effects
+     ==================================== */
+  --shadow-light: rgba(44, 44, 44, 0.1);
+  --shadow-medium: rgba(44, 44, 44, 0.15);
+  --shadow-heavy: rgba(44, 44, 44, 0.25);
+  --shadow-colored: rgba(0, 102, 255, 0.3);
+
+  /* ====================================
+     INTERACTIVE STATES
+     Hover, focus, active, disabled
+     ==================================== */
+  
+  /* Button States */
+  --btn-primary-bg: var(--primary-gradient);
+  --btn-primary-hover: var(--electric-blue);
+  --btn-primary-active: var(--dark-charcoal);
+
+  --btn-secondary-bg: var(--white);
+  --btn-secondary-border: var(--electric-blue);
+  --btn-secondary-hover-bg: var(--electric-blue);
+  --btn-secondary-hover-text: var(--white);
+
+  --btn-coral-bg: var(--coral-gradient);
+  --btn-coral-hover: var(--vibrant-coral);
+
+  --btn-teal-bg: var(--teal-gradient);
+  --btn-teal-hover: var(--soft-teal);
+
+  --btn-gold-bg: var(--muted-gold);
+  --btn-gold-hover: var(--sunset-orange);
+
+  /* Input States */
+  --input-bg: var(--white);
+  --input-border: var(--light-gray);
+  --input-border-focus: var(--electric-blue);
+  --input-placeholder: var(--dark-charcoal);
+
+  /* Link States */
+  --link-default: var(--electric-blue);
+  --link-hover: var(--light-sky-blue);
+  --link-visited: var(--electric-blue);
+  --link-active: var(--dark-charcoal);
+
+  /* ====================================
+     COMPONENT-SPECIFIC COLORS
+     Special use cases and components
+     ==================================== */
+  
+  /* Navbar */
+  --navbar-bg: var(--white);
+  --navbar-border: var(--light-gray);
+  --navbar-link: var(--dark-charcoal);
+  --navbar-link-active: var(--electric-blue);
+
+  /* Cards */
+  --card-bg: var(--white);
+  --card-border: var(--light-gray);
+  --card-shadow: var(--shadow-light);
+
+  /* Progress & Loading */
+  --progress-bg: var(--light-gray);
+  --progress-fill: var(--electric-blue);
+  --loading-spinner: var(--electric-blue);
+
+  /* Ratings & Reviews */
+  --rating-star: var(--muted-gold);
+  --rating-empty: var(--light-gray);
+
+  /* Status Indicators */
+  --status-online: var(--soft-teal);
+  --status-offline: var(--light-gray);
+  --status-busy: var(--vibrant-coral);
+  --status-away: var(--sunset-orange);
+
+  /* ====================================
+     DARK MODE OVERRIDES
+     Alternative color scheme
+     ==================================== */
+  
+  /* Note: Dark mode variables can be defined here
+     and activated via [data-theme="dark"] selector */
+}
+
+/* ====================================
+   UTILITY CLASSES
+   Quick color application helpers
+   ==================================== */
+
+/* Background Colors */
+.bg-electric-blue { background-color: var(--electric-blue) !important; }
+.bg-dark-charcoal { background-color: var(--dark-charcoal) !important; }
+.bg-white { background-color: var(--white) !important; }
+.bg-vibrant-coral { background-color: var(--vibrant-coral) !important; }
+.bg-soft-teal { background-color: var(--soft-teal) !important; }
+.bg-light-gray { background-color: var(--light-gray) !important; }
+.bg-muted-gold { background-color: var(--muted-gold) !important; }
+.bg-sunset-orange { background-color: var(--sunset-orange) !important; }
+.bg-light-sky-blue { background-color: var(--light-sky-blue) !important; }
+
+/* Gradient Backgrounds */
+.bg-primary-gradient { background: var(--primary-gradient) !important; }
+.bg-coral-gradient { background: var(--coral-gradient) !important; }
+.bg-teal-gradient { background: var(--teal-gradient) !important; }
+.bg-gold-gradient { background: var(--gold-gradient) !important; }
+
+/* Text Colors */
+.text-electric-blue { color: var(--electric-blue) !important; }
+.text-dark-charcoal { color: var(--dark-charcoal) !important; }
+.text-white { color: var(--white) !important; }
+.text-vibrant-coral { color: var(--vibrant-coral) !important; }
+.text-soft-teal { color: var(--soft-teal) !important; }
+.text-muted-gold { color: var(--muted-gold) !important; }
+.text-sunset-orange { color: var(--sunset-orange) !important; }
+.text-light-sky-blue { color: var(--light-sky-blue) !important; }
+
+/* Semantic Text Colors */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary); opacity: var(--text-opacity-medium) !important; }
+.text-muted { color: var(--text-muted); opacity: var(--text-opacity-low) !important; }
+.text-disabled { color: var(--text-disabled); opacity: var(--text-opacity-disabled) !important; }
+.text-success { color: var(--success-color) !important; }
+.text-error { color: var(--error-color) !important; }
+.text-warning { color: var(--warning-color) !important; }
+.text-info { color: var(--info-color) !important; }
+
+/* Border Colors */
+.border-electric-blue { border-color: var(--electric-blue) !important; }
+.border-soft-teal { border-color: var(--soft-teal) !important; }
+.border-vibrant-coral { border-color: var(--vibrant-coral) !important; }
+.border-light-gray { border-color: var(--light-gray) !important; }
+.border-success { border-color: var(--success-border) !important; }
+.border-error { border-color: var(--error-border) !important; }
+.border-warning { border-color: var(--warning-border) !important; }
+.border-info { border-color: var(--info-border) !important; }
+
+/* ====================================
+   THEME VALIDATION
+   CSS custom property fallbacks
+   ==================================== */
+
+/* Ensure all critical colors have fallbacks */
+:root {
+  --electric-blue: #0066FF;
+  --fallback-primary: var(--electric-blue, #0066FF);
+  --fallback-text: var(--dark-charcoal, #2C2C2C);
+  --fallback-bg: var(--white, #FFFFFF);
+  --fallback-border: var(--light-gray, #F5F5F5);
+}

@@ -16,6 +16,7 @@ export const ProfileProvider = ({ children }) => {
     profileImageUrl: '',
     title: '',
     bio: '',
+    username: '',
     socialLinks: {
       instagram: '',
       twitter: '',
@@ -134,6 +135,17 @@ export const ProfileProvider = ({ children }) => {
     });
   };
 
+  const trackLinkClick = (linkId) => {
+    setProfileData(prev => ({
+      ...prev,
+      customLinks: prev.customLinks.map(link => 
+        link.id === linkId 
+          ? { ...link, clicks: (link.clicks || 0) + 1 }
+          : link
+      )
+    }));
+  };
+
   const updateAppearance = (updates) => {
     setAppearanceData(prev => ({
       ...prev,
@@ -166,6 +178,7 @@ export const ProfileProvider = ({ children }) => {
       profileImageUrl: '',
       title: '',
       bio: '',
+      username: '',
       socialLinks: {
         instagram: '',
         twitter: '',
@@ -268,7 +281,8 @@ export const ProfileProvider = ({ children }) => {
     addCustomLink,
     updateCustomLink,
     deleteCustomLink,
-    reorderCustomLinks
+    reorderCustomLinks,
+    trackLinkClick
   };
 
   return (
