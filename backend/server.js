@@ -1,6 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
+// Load production config if in production
+const productionConfig = process.env.NODE_ENV === 'production' ? require('./config.production') : null;
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const connectDB = require('./config/database');
@@ -14,7 +17,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 connectDB();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        process.env.FRONTEND_URL,
+        'https://your-frontend-domain.vercel.app',
+        /\.vercel\.app$/,
+        /\.netlify\.app$/
+      ]
+    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
