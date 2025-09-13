@@ -1,0 +1,985 @@
+/* PortfolioBuilder CSS Styles */
+.portfolio-builder {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.portfolio-builder .min-h-screen {
+  min-height: 100vh;
+}
+
+.portfolio-builder .bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.portfolio-builder .bg-white {
+  background-color: #ffffff;
+}
+
+.portfolio-builder .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-builder .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.portfolio-builder .border-b {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.portfolio-builder .border {
+  border: 1px solid #e5e7eb;
+}
+
+.portfolio-builder .border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.portfolio-builder .border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+.portfolio-builder .border-red-200 {
+  border-color: #fecaca;
+}
+
+.portfolio-builder .border-blue-200 {
+  border-color: #bfdbfe;
+}
+
+.portfolio-builder .rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.portfolio-builder .rounded {
+  border-radius: 0.25rem;
+}
+
+.portfolio-builder .px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.portfolio-builder .py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.portfolio-builder .px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.portfolio-builder .py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.portfolio-builder .px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.portfolio-builder .py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.portfolio-builder .py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.portfolio-builder .p-4 {
+  padding: 1rem;
+}
+
+.portfolio-builder .p-6 {
+  padding: 1.5rem;
+}
+
+.portfolio-builder .p-2 {
+  padding: 0.5rem;
+}
+
+.portfolio-builder .p-1 {
+  padding: 0.25rem;
+}
+
+.portfolio-builder .mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.portfolio-builder .mr-2 {
+  margin-right: 0.5rem;
+}
+
+.portfolio-builder .mr-4 {
+  margin-right: 1rem;
+}
+
+.portfolio-builder .mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.portfolio-builder .mb-4 {
+  margin-bottom: 1rem;
+}
+
+.portfolio-builder .mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.portfolio-builder .mt-1 {
+  margin-top: 0.25rem;
+}
+
+.portfolio-builder .mt-2 {
+  margin-top: 0.5rem;
+}
+
+.portfolio-builder .ml-2 {
+  margin-left: 0.5rem;
+}
+
+.portfolio-builder .ml-1 {
+  margin-left: 0.25rem;
+}
+
+.portfolio-builder .space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.portfolio-builder .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.portfolio-builder .space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.portfolio-builder .space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.portfolio-builder .space-x-3 > * + * {
+  margin-left: 0.75rem;
+}
+
+.portfolio-builder .space-x-2 > * + * {
+  margin-left: 0.5rem;
+}
+
+.portfolio-builder .space-x-4 > * + * {
+  margin-left: 1rem;
+}
+
+.portfolio-builder .flex {
+  display: flex;
+}
+
+.portfolio-builder .grid {
+  display: grid;
+}
+
+.portfolio-builder .items-center {
+  align-items: center;
+}
+
+.portfolio-builder .items-start {
+  align-items: flex-start;
+}
+
+.portfolio-builder .items-end {
+  align-items: flex-end;
+}
+
+.portfolio-builder .justify-between {
+  justify-content: space-between;
+}
+
+.portfolio-builder .justify-center {
+  justify-content: center;
+}
+
+.portfolio-builder .grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.portfolio-builder .grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.portfolio-builder .grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.portfolio-builder .lg\\:grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.portfolio-builder .gap-6 {
+  gap: 1.5rem;
+}
+
+.portfolio-builder .gap-3 {
+  gap: 0.75rem;
+}
+
+.portfolio-builder .gap-8 {
+  gap: 2rem;
+}
+
+.portfolio-builder .gap-4 {
+  gap: 1rem;
+}
+
+.portfolio-builder .gap-2 {
+  gap: 0.5rem;
+}
+
+.portfolio-builder .w-full {
+  width: 100%;
+}
+
+.portfolio-builder .max-w-7xl {
+  max-width: 1280px;
+}
+
+.portfolio-builder .flex-1 {
+  flex: 1 1 0%;
+}
+
+.portfolio-builder .text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.portfolio-builder .text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.portfolio-builder .text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.portfolio-builder .text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.portfolio-builder .font-bold {
+  font-weight: 700;
+}
+
+.portfolio-builder .font-semibold {
+  font-weight: 600;
+}
+
+.portfolio-builder .font-medium {
+  font-weight: 500;
+}
+
+.portfolio-builder .text-gray-900 {
+  color: #111827;
+}
+
+.portfolio-builder .text-gray-700 {
+  color: #374151;
+}
+
+.portfolio-builder .text-gray-600 {
+  color: #4b5563;
+}
+
+.portfolio-builder .text-gray-500 {
+  color: #6b7280;
+}
+
+.portfolio-builder .text-blue-600 {
+  color: #2563eb;
+}
+
+.portfolio-builder .text-blue-700 {
+  color: #1d4ed8;
+}
+
+.portfolio-builder .text-red-600 {
+  color: #dc2626;
+}
+
+.portfolio-builder .text-white {
+  color: #ffffff;
+}
+
+.portfolio-builder .bg-blue-600 {
+  background-color: #2563eb;
+}
+
+.portfolio-builder .bg-blue-700 {
+  background-color: #1d4ed8;
+}
+
+.portfolio-builder .bg-blue-100 {
+  background-color: #dbeafe;
+}
+
+.portfolio-builder .bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.portfolio-builder .bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.portfolio-builder .bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.portfolio-builder .hover\\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.portfolio-builder .hover\\:bg-gray-100:hover {
+  background-color: #f3f4f6;
+}
+
+.portfolio-builder .hover\\:bg-blue-700:hover {
+  background-color: #1d4ed8;
+}
+
+.portfolio-builder .hover\\:bg-red-50:hover {
+  background-color: #fef2f2;
+}
+
+.portfolio-builder .hover\\:bg-blue-50:hover {
+  background-color: #eff6ff;
+}
+
+.portfolio-builder .hover\\:text-gray-900:hover {
+  color: #111827;
+}
+
+.portfolio-builder .hover\\:text-blue-800:hover {
+  color: #1e40af;
+}
+
+.portfolio-builder .focus\\:ring-2:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.portfolio-builder .focus\\:ring-blue-500:focus {
+  --tw-ring-color: #3b82f6;
+}
+
+.portfolio-builder .focus\\:border-blue-500:focus {
+  border-color: #3b82f6;
+}
+
+.portfolio-builder .disabled\\:opacity-50:disabled {
+  opacity: 0.5;
+}
+
+.portfolio-builder .cursor-pointer {
+  cursor: pointer;
+}
+
+.portfolio-builder .block {
+  display: block;
+}
+
+.portfolio-builder .text-left {
+  text-align: left;
+}
+
+.portfolio-builder .text-center {
+  text-align: center;
+}
+
+.portfolio-builder .sticky {
+  position: sticky;
+}
+
+.portfolio-builder .top-8 {
+  top: 2rem;
+}
+
+.portfolio-builder .relative {
+  position: relative;
+}
+
+.portfolio-builder .absolute {
+  position: absolute;
+}
+
+.portfolio-builder .left-3 {
+  left: 0.75rem;
+}
+
+.portfolio-builder .top-2-5 {
+  top: 0.625rem;
+}
+
+.portfolio-builder .pl-10 {
+  padding-left: 2.5rem;
+}
+
+.portfolio-builder .pr-3 {
+  padding-right: 0.75rem;
+}
+
+.portfolio-builder .h-5 {
+  height: 1.25rem;
+}
+
+.portfolio-builder .w-5 {
+  width: 1.25rem;
+}
+
+.portfolio-builder .h-4 {
+  width: 1rem;
+  height: 1rem;
+}
+
+.portfolio-builder .w-4 {
+  width: 1rem;
+}
+
+.portfolio-builder .h-3 {
+  height: 0.75rem;
+}
+
+.portfolio-builder .w-3 {
+  width: 0.75rem;
+}
+
+.portfolio-builder .h-12 {
+  height: 3rem;
+}
+
+.portfolio-builder .w-12 {
+  width: 3rem;
+}
+
+.portfolio-builder .transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.portfolio-builder .lg\\:col-span-1 {
+  grid-column: span 1 / span 1;
+}
+
+.portfolio-builder .lg\\:col-span-3 {
+  grid-column: span 3 / span 3;
+}
+
+/* Custom input and button styles */
+.portfolio-builder input[type="text"],
+.portfolio-builder input[type="email"],
+.portfolio-builder input[type="tel"],
+.portfolio-builder input[type="url"],
+.portfolio-builder textarea,
+.portfolio-builder select {
+  appearance: none;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem 3rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #111827;
+  width: 100%;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-builder input[type="text"]:focus,
+.portfolio-builder input[type="email"]:focus,
+.portfolio-builder input[type="tel"]:focus,
+.portfolio-builder input[type="url"]:focus,
+.portfolio-builder textarea:focus,
+.portfolio-builder select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.portfolio-builder textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.portfolio-builder button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-builder button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+}
+
+.portfolio-builder button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-builder button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-builder label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.025em;
+}
+
+.portfolio-builder input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  color: #2563eb;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.portfolio-builder input[type="checkbox"]:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.portfolio-builder input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Perfect icon alignment */
+.portfolio-builder .relative {
+  position: relative;
+  display: block;
+}
+
+.portfolio-builder .absolute.left-3 {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portfolio-builder .pl-10 {
+  padding-left: 2.75rem;
+}
+
+.portfolio-builder .pr-3 {
+  padding-right: 1rem;
+}
+
+.portfolio-builder .py-2 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.portfolio-builder .absolute.left-3 svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  transition: color 0.3s ease-in-out;
+  flex-shrink: 0;
+}
+
+.portfolio-builder .relative:focus-within .absolute svg {
+  color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.portfolio-builder .top-2-5 {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Ensure proper stacking */
+.portfolio-builder input {
+  position: relative;
+  z-index: 1;
+}
+
+.portfolio-builder .absolute {
+  z-index: 2;
+}
+
+/* Enhanced card styles */
+.portfolio-builder .bg-white {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.portfolio-builder .rounded-lg {
+  border-radius: 0.75rem;
+}
+
+/* Button specific styles */
+.portfolio-builder .bg-blue-600 {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.portfolio-builder .bg-blue-600:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.portfolio-builder .border-gray-300 {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+.portfolio-builder .border-gray-300:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.portfolio-builder .text-blue-600 {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.portfolio-builder .text-blue-600:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: #2563eb;
+}
+
+.portfolio-builder .text-red-600 {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.portfolio-builder .text-red-600:hover {
+  background: rgba(220, 38, 38, 0.2);
+  color: #b91c1c;
+}
+
+/* Section headers */
+.portfolio-builder .border-b {
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* Input group spacing */
+.portfolio-builder .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.portfolio-builder .space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Perfect spacing for forms */
+.portfolio-builder .p-6 {
+  padding: 2rem;
+}
+
+.portfolio-builder .p-4 {
+  padding: 1.5rem;
+}
+
+/* Grid improvements */
+.portfolio-builder .gap-6 {
+  gap: 2rem;
+}
+
+.portfolio-builder .gap-4 {
+  gap: 1.5rem;
+}
+
+.portfolio-builder .gap-3 {
+  gap: 1rem;
+}
+
+/* Clean responsive design */
+
+/* Professional sidebar navigation */
+.portfolio-builder nav button {
+  width: 100%;
+  text-align: left;
+  padding: 0.875rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.portfolio-builder .bg-blue-100 {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.portfolio-builder .text-gray-600 {
+  color: #4b5563;
+}
+
+.portfolio-builder .text-gray-600:hover {
+  background: #f9fafb;
+  color: #1f2937;
+  border-color: #e5e7eb;
+}
+
+/* Enhanced header styling */
+.portfolio-builder .shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+/* Improved typography */
+.portfolio-builder h1 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #1f2937;
+}
+
+.portfolio-builder h2 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #1f2937;
+}
+
+.portfolio-builder h3 {
+  font-weight: 600;
+  color: #374151;
+}
+
+.portfolio-builder h4 {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+/* Enhanced placeholder styling */
+.portfolio-builder input::placeholder,
+.portfolio-builder textarea::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Contact card improvements */
+.portfolio-builder .space-y-3 .border-gray-200 {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.portfolio-builder .space-y-3 .border-gray-200:hover {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+/* Section styling improvements */
+.portfolio-builder .border-gray-200.rounded-lg {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.portfolio-builder .bg-gray-50.border-b {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Empty state styling */
+.portfolio-builder .text-gray-500 {
+  color: #6b7280;
+}
+
+.portfolio-builder .py-12 {
+  padding: 3rem 2rem;
+}
+
+/* Settings card styling */
+.portfolio-builder .bg-blue-50 {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+}
+
+.portfolio-builder .text-blue-900 {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.portfolio-builder .bg-blue-100 {
+  background: #dbeafe;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.portfolio-builder .text-blue-800 {
+  color: #1e40af;
+  font-weight: 500;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Micro-interactions */
+.portfolio-builder button:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Perfect spacing */
+.portfolio-builder .py-8 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.portfolio-builder .sm\\:px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.portfolio-builder .lg\\:px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+/* Professional loading states */
+.portfolio-builder .disabled\\:opacity-50:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Smooth page transitions */
+.portfolio-builder {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card entrance animations */
+.portfolio-builder .bg-white.rounded-lg {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button pulse on save */
+.portfolio-builder .bg-blue-600:active {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Input focus glow effect */
+.portfolio-builder input:focus,
+.portfolio-builder textarea:focus,
+.portfolio-builder select:focus {
+  animation: focusGlow 0.3s ease-in-out;
+}
+
+@keyframes focusGlow {
+  from {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  to {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Professional typography scales */
+.portfolio-builder .text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 640px) {
+  .portfolio-builder .p-6 {
+    padding: 1.5rem;
+  }
+  
+  .portfolio-builder .py-8 {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  .portfolio-builder .gap-6 {
+    gap: 1.5rem;
+  }
+  
+  .portfolio-builder input,
+  .portfolio-builder textarea,
+  .portfolio-builder select {
+    font-size: 1rem; /* Prevent zoom on iOS */
+  }
+}

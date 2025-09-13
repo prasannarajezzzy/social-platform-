@@ -11,6 +11,8 @@ import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import PublicProfile from './pages/PublicProfile';
 import AboutUs from './pages/AboutUs';
+import PortfolioBuilder from './pages/PortfolioBuilder';
+import PortfolioDisplay from './pages/PortfolioDisplay';
 import './App.css';
 
 function App() {
@@ -42,6 +44,23 @@ function App() {
               />
               <Route path="/u/:username" element={<PublicProfile />} />
               <Route path="/profile/public" element={<PublicProfile />} />
+              <Route 
+                path="/portfolio/builder" 
+                element={
+                  <ProtectedRoute>
+                    <PortfolioBuilder />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/portfolio/preview/:username" 
+                element={
+                  <ProtectedRoute>
+                    <PortfolioDisplay />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/portfolio/:username" element={<PortfolioDisplay />} />
               <Route path="/about" element={<AboutUs />} />
             </Routes>
           </div>

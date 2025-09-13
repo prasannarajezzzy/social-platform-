@@ -42,6 +42,21 @@ export const ProfileProvider = ({ children }) => {
     customCSS: ''
   });
 
+  const [portfolioData, setPortfolioData] = useState({
+    isPortfolioEnabled: false,
+    fullName: '',
+    portfolioUsername: '',
+    resumeUrl: '',
+    contactInfo: {
+      phone: '',
+      email: '',
+      additionalContacts: []
+    },
+    sections: [],
+    theme: 'professional',
+    isPublic: false
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [analyticsData, setAnalyticsData] = useState(null);
 
@@ -86,6 +101,21 @@ export const ProfileProvider = ({ children }) => {
           buttonLayout: response.profile.appearanceData?.buttonLayout || 'stack',
           font: response.profile.appearanceData?.font || 'inter',
           customCSS: response.profile.appearanceData?.customCSS || ''
+        });
+
+        setPortfolioData({
+          isPortfolioEnabled: response.profile.portfolioData?.isPortfolioEnabled || false,
+          fullName: response.profile.portfolioData?.fullName || '',
+          portfolioUsername: response.profile.portfolioData?.portfolioUsername || '',
+          resumeUrl: response.profile.portfolioData?.resumeUrl || '',
+          contactInfo: {
+            phone: response.profile.portfolioData?.contactInfo?.phone || '',
+            email: response.profile.portfolioData?.contactInfo?.email || '',
+            additionalContacts: response.profile.portfolioData?.contactInfo?.additionalContacts || []
+          },
+          sections: response.profile.portfolioData?.sections || [],
+          theme: response.profile.portfolioData?.theme || 'professional',
+          isPublic: response.profile.portfolioData?.isPublic || false
         });
 
         // Load analytics data
@@ -340,7 +370,7 @@ export const ProfileProvider = ({ children }) => {
         };
         
         // Save to backend API
-        const response = await authAPI.saveProfile(backendProfileData, appearanceData);
+        const response = await authAPI.saveProfile(backendProfileData, appearanceData, portfolioData);
         if (response.success) {
           console.log('Profile saved successfully to backend');
           return { success: true };
@@ -454,9 +484,232 @@ export const ProfileProvider = ({ children }) => {
     return styles[appearanceData.buttonStyle] || styles['rounded'];
   };
 
+  // Portfolio management functions
+  const updatePortfolioData = (updates) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      ...updates
+    }));
+  };
+
+  const addPortfolioSection = () => {
+    const newSection = {
+      id: Date.now().toString(),
+      sectionName: '',
+      order: portfolioData.sections.length,
+      subsections: []
+    };
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: [...prev.sections, newSection]
+    }));
+    return newSection.id;
+  };
+
+  const updatePortfolioSection = (sectionId, updates) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId ? { ...section, ...updates } : section
+      )
+    }));
+  };
+
+  const deletePortfolioSection = (sectionId) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.filter(section => section.id !== sectionId)
+    }));
+  };
+
+  const addSubsection = (sectionId) => {
+    const newSubsection = {
+      id: Date.now().toString(),
+      title: '',
+      bulletPoints: [''],
+      order: 0,
+      dateRange: { startDate: '', endDate: '', isCurrent: false },
+      description: '',
+      tags: []
+    };
+
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              subsections: [...section.subsections, { ...newSubsection, order: section.subsections.length }]
+            }
+          : section
+      )
+    }));
+    return newSubsection.id;
+  };
+
+  const updateSubsection = (sectionId, subsectionId, updates) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              subsections: section.subsections.map(subsection =>
+                subsection.id === subsectionId ? { ...subsection, ...updates } : subsection
+              )
+            }
+          : section
+      )
+    }));
+  };
+
+  const deleteSubsection = (sectionId, subsectionId) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId
+          ? {
+              ...section,
+              subsections: section.subsections.filter(subsection => subsection.id !== subsectionId)
+            }
+          : section
+      )
+    }));
+  };
+
+  const addBulletPoint = (sectionId, subsectionId) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section => {
+        if (section.id === sectionId) {
+          // If subsectionId is null, add to section level
+          if (subsectionId === null) {
+            return {
+              ...section,
+              bulletPoints: [...(section.bulletPoints || []), '']
+            };
+          } else {
+            // Add to subsection level
+            return {
+              ...section,
+              subsections: section.subsections.map(subsection =>
+                subsection.id === subsectionId
+                  ? { ...subsection, bulletPoints: [...(subsection.bulletPoints || []), ''] }
+                  : subsection
+              )
+            };
+          }
+        }
+        return section;
+      })
+    }));
+  };
+
+  const updateBulletPoint = (sectionId, subsectionId, bulletIndex, value) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section => {
+        if (section.id === sectionId) {
+          // If subsectionId is null, update section level bullet points
+          if (subsectionId === null) {
+            return {
+              ...section,
+              bulletPoints: (section.bulletPoints || []).map((point, index) =>
+                index === bulletIndex ? value : point
+              )
+            };
+          } else {
+            // Update subsection level bullet points
+            return {
+              ...section,
+              subsections: section.subsections.map(subsection =>
+                subsection.id === subsectionId
+                  ? {
+                      ...subsection,
+                      bulletPoints: (subsection.bulletPoints || []).map((point, index) =>
+                        index === bulletIndex ? value : point
+                      )
+                    }
+                  : subsection
+              )
+            };
+          }
+        }
+        return section;
+      })
+    }));
+  };
+
+  const deleteBulletPoint = (sectionId, subsectionId, bulletIndex) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      sections: prev.sections.map(section => {
+        if (section.id === sectionId) {
+          // If subsectionId is null, delete from section level bullet points
+          if (subsectionId === null) {
+            return {
+              ...section,
+              bulletPoints: (section.bulletPoints || []).filter((_, index) => index !== bulletIndex)
+            };
+          } else {
+            // Delete from subsection level bullet points
+            return {
+              ...section,
+              subsections: section.subsections.map(subsection =>
+                subsection.id === subsectionId
+                  ? {
+                      ...subsection,
+                      bulletPoints: (subsection.bulletPoints || []).filter((_, index) => index !== bulletIndex)
+                    }
+                  : subsection
+              )
+            };
+          }
+        }
+        return section;
+      })
+    }));
+  };
+
+  const addAdditionalContact = () => {
+    setPortfolioData(prev => ({
+      ...prev,
+      contactInfo: {
+        ...prev.contactInfo,
+        additionalContacts: [
+          ...prev.contactInfo.additionalContacts,
+          { label: '', value: '', type: 'other' }
+        ]
+      }
+    }));
+  };
+
+  const updateAdditionalContact = (index, field, value) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      contactInfo: {
+        ...prev.contactInfo,
+        additionalContacts: prev.contactInfo.additionalContacts.map((contact, i) =>
+          i === index ? { ...contact, [field]: value } : contact
+        )
+      }
+    }));
+  };
+
+  const deleteAdditionalContact = (index) => {
+    setPortfolioData(prev => ({
+      ...prev,
+      contactInfo: {
+        ...prev.contactInfo,
+        additionalContacts: prev.contactInfo.additionalContacts.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
   const value = {
     profileData,
     appearanceData,
+    portfolioData,
     analyticsData,
     isLoading,
     updateProfile,
@@ -474,7 +727,21 @@ export const ProfileProvider = ({ children }) => {
     reorderCustomLinks,
     trackLinkClick,
     loadProfileFromBackend,
-    loadAnalytics
+    loadAnalytics,
+    // Portfolio functions
+    updatePortfolioData,
+    addPortfolioSection,
+    updatePortfolioSection,
+    deletePortfolioSection,
+    addSubsection,
+    updateSubsection,
+    deleteSubsection,
+    addBulletPoint,
+    updateBulletPoint,
+    deleteBulletPoint,
+    addAdditionalContact,
+    updateAdditionalContact,
+    deleteAdditionalContact
   };
 
   return (

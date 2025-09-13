@@ -141,6 +141,86 @@ const userSchema = new mongoose.Schema({
     },
     customCSS: String
   },
+  portfolioData: {
+    isPortfolioEnabled: {
+      type: Boolean,
+      default: false
+    },
+    fullName: String,
+    portfolioUsername: {
+      type: String,
+      sparse: true,
+      trim: true,
+      lowercase: true
+    },
+    resumeUrl: String,
+    contactInfo: {
+      phone: String,
+      email: String,
+      additionalContacts: [{
+        label: String,
+        value: String,
+        type: {
+          type: String,
+          enum: ['email', 'phone', 'website', 'social', 'other'],
+          default: 'other'
+        }
+      }]
+    },
+        sections: [{
+          id: {
+            type: String,
+            default: () => Date.now().toString()
+          },
+          sectionName: {
+            type: String,
+            required: [true, 'Section name is required']
+          },
+          bulletPoints: [String],
+          order: {
+            type: Number,
+            default: 0
+          },
+          subsections: [{
+            id: {
+              type: String,
+              default: () => Date.now().toString()
+            },
+            title: String,
+            bulletPoints: [String],
+            order: {
+              type: Number,
+              default: 0
+            },
+            dateRange: {
+              startDate: String,
+              endDate: String,
+              isCurrent: {
+                type: Boolean,
+                default: false
+              }
+            },
+            description: String,
+            tags: [String]
+          }]
+        }],
+    theme: {
+      type: String,
+      default: 'professional'
+    },
+    isPublic: {
+      type: Boolean,
+      default: false
+    },
+    portfolioViews: {
+      type: Number,
+      default: 0
+    },
+    lastUpdated: {
+      type: Date,
+      default: Date.now
+    }
+  },
   analytics: {
     profileViews: {
       total: { type: Number, default: 0 },

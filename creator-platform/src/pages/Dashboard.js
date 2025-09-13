@@ -16,12 +16,16 @@ import {
   Upload,
   TrendingUp,
   Calendar,
-  Heart
+  Heart,
+  Briefcase,
+  User,
+  FileText,
+  Palette
 } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { profileData, analyticsData, loadAnalytics } = useProfile();
+  const { profileData, portfolioData, analyticsData, loadAnalytics } = useProfile();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Get actual data from profile and analytics
@@ -313,6 +317,211 @@ const Dashboard = () => {
     </div>
   );
 
+  const renderPortfolio = () => (
+    <div className="portfolio-content">
+      <div className="section-header">
+        <h2>Portfolio</h2>
+        <div className="portfolio-actions">
+          {portfolioData.isPortfolioEnabled ? (
+            <>
+              <button 
+                className="btn btn-ghost"
+                onClick={() => navigate(`/portfolio/preview/${portfolioData.portfolioUsername || 'preview'}`)}
+              >
+                <Eye size={20} />
+                Preview
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={() => navigate('/portfolio/builder')}
+              >
+                <Edit3 size={20} />
+                Edit Portfolio
+              </button>
+            </>
+          ) : (
+            <button 
+              className="btn btn-primary"
+              onClick={() => navigate('/portfolio/builder')}
+            >
+              <Plus size={20} />
+              Create Portfolio
+            </button>
+          )}
+        </div>
+      </div>
+
+      {portfolioData.isPortfolioEnabled ? (
+        <div className="portfolio-overview">
+          <div className="portfolio-grid">
+            <div className="portfolio-card">
+              <div className="portfolio-card-header">
+                <div className="portfolio-icon">
+                  <User size={24} />
+                </div>
+                <div className="portfolio-info">
+                  <h3>Portfolio Status</h3>
+                  <p className={`portfolio-status ${portfolioData.isPublic ? 'active' : 'draft'}`}>
+                    {portfolioData.isPublic ? 'Public' : 'Draft'}
+                  </p>
+                </div>
+              </div>
+              {portfolioData.isPublic && (
+                <div className="portfolio-url">
+                  <label>Portfolio URL:</label>
+                  <div className="url-display">
+                    <code>{window.location.origin}/portfolio/{portfolioData.portfolioUsername}</code>
+                    <button 
+                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/portfolio/${portfolioData.portfolioUsername}`)}
+                      className="copy-btn"
+                      title="Copy URL"
+                    >
+                      <ExternalLink size={16} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="portfolio-card">
+              <div className="portfolio-card-header">
+                <div className="portfolio-icon">
+                  <FileText size={24} />
+                </div>
+                <div className="portfolio-info">
+                  <h3>Portfolio Sections</h3>
+                  <p>{portfolioData.sections.length} sections</p>
+                </div>
+              </div>
+              <div className="section-list">
+                {portfolioData.sections.slice(0, 3).map((section, index) => (
+                  <div key={section.id} className="section-item">
+                    <span>{section.sectionName}</span>
+                    <span className="subsection-count">{section.subsections.length} items</span>
+                  </div>
+                ))}
+                {portfolioData.sections.length > 3 && (
+                  <div className="section-item">
+                    <span>+{portfolioData.sections.length - 3} more sections</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="portfolio-card">
+              <div className="portfolio-card-header">
+                <div className="portfolio-icon">
+                  <Eye size={24} />
+                </div>
+                <div className="portfolio-info">
+                  <h3>Portfolio Views</h3>
+                  <p>{portfolioData.portfolioViews || 0} total views</p>
+                </div>
+              </div>
+              <div className="portfolio-stats">
+                <div className="stat-item">
+                  <span>Resume Downloads:</span>
+                  <span>0</span>
+                </div>
+                <div className="stat-item">
+                  <span>Last Updated:</span>
+                  <span>{new Date(portfolioData.lastUpdated || Date.now()).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="portfolio-preview">
+            <div className="preview-header">
+              <h3>Portfolio Preview</h3>
+              <button 
+                className="btn btn-ghost"
+                onClick={() => navigate(`/portfolio/preview/${portfolioData.portfolioUsername || 'preview'}`)}
+              >
+                View Full Portfolio
+              </button>
+            </div>
+            <div className="preview-content">
+              <div className="preview-profile">
+                <div className="preview-avatar">
+                  {profileData.profileImageUrl ? (
+                    <img src={profileData.profileImageUrl} alt={profileData.name} />
+                  ) : (
+                    <User size={32} />
+                  )}
+                </div>
+                <div className="preview-info">
+                  <h4>{profileData.name || 'Your Name'}</h4>
+                  <p>{profileData.title || 'Your Title'}</p>
+                  {portfolioData.contactInfo.email && (
+                    <p className="preview-contact">{portfolioData.contactInfo.email}</p>
+                  )}
+                </div>
+              </div>
+              <div className="preview-sections">
+                {portfolioData.sections.slice(0, 2).map(section => (
+                  <div key={section.id} className="preview-section">
+                    <h5>{section.sectionName}</h5>
+                    <p>{section.subsections.length} {section.subsections.length === 1 ? 'item' : 'items'}</p>
+                  </div>
+                ))}
+                {portfolioData.sections.length === 0 && (
+                  <p className="preview-empty">No sections added yet</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="portfolio-empty">
+          <div className="empty-icon">
+            <Briefcase size={64} />
+          </div>
+          <h3>Create Your Professional Portfolio</h3>
+          <p>Build a stunning online portfolio to showcase your work, experience, and skills to potential employers and clients.</p>
+          
+          <div className="portfolio-features">
+            <div className="feature-item">
+              <div className="feature-icon">
+                <User size={20} />
+              </div>
+              <div className="feature-content">
+                <h4>Professional Profile</h4>
+                <p>Add your contact information, resume, and professional details</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">
+                <Briefcase size={20} />
+              </div>
+              <div className="feature-content">
+                <h4>Dynamic Sections</h4>
+                <p>Create custom sections for experience, education, skills, and projects</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">
+                <Palette size={20} />
+              </div>
+              <div className="feature-content">
+                <h4>Professional Themes</h4>
+                <p>Choose from multiple professional themes to match your style</p>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            className="btn btn-primary btn-large"
+            onClick={() => navigate('/portfolio/builder')}
+          >
+            <Plus size={20} />
+            Get Started
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   const renderAnalytics = () => (
     <div className="analytics-content">
       <div className="section-header">
@@ -408,6 +617,13 @@ const Dashboard = () => {
               <Link2 size={20} />
               Links
             </button>
+            <button 
+              className={`nav-tab ${activeTab === 'portfolio' ? 'active' : ''}`}
+              onClick={() => setActiveTab('portfolio')}
+            >
+              <Briefcase size={20} />
+              Portfolio
+            </button>
             {/* <button 
               className={`nav-tab ${activeTab === 'products' ? 'active' : ''}`}
               onClick={() => setActiveTab('products')}
@@ -430,6 +646,7 @@ const Dashboard = () => {
         <div className="container">
           {activeTab === 'overview' && renderOverview()}
           {activeTab === 'links' && renderLinks()}
+          {activeTab === 'portfolio' && renderPortfolio()}
           {activeTab === 'products' && renderProducts()}
           {activeTab === 'analytics' && renderAnalytics()}
         </div>
@@ -996,6 +1213,361 @@ const Dashboard = () => {
             align-items: flex-start;
             gap: 12px;
           }
+
+          .portfolio-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .portfolio-features {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* Portfolio Styles */
+        .portfolio-content {
+          max-width: 1200px;
+        }
+
+        .portfolio-actions {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .portfolio-overview {
+          space-y: 32px;
+        }
+
+        .portfolio-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 24px;
+          margin-bottom: 32px;
+        }
+
+        .portfolio-card {
+          background: var(--white);
+          border-radius: 12px;
+          padding: 24px;
+          border: 1px solid var(--light-gray);
+          transition: all 0.3s ease;
+        }
+
+        .portfolio-card:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-color: var(--electric-blue);
+        }
+
+        .portfolio-card-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+
+        .portfolio-icon {
+          width: 48px;
+          height: 48px;
+          background: linear-gradient(135deg, var(--electric-blue), var(--purple));
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+        }
+
+        .portfolio-info h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: var(--dark-charcoal);
+          margin-bottom: 4px;
+        }
+
+        .portfolio-info p {
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+          font-size: 0.9rem;
+        }
+
+        .portfolio-status {
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          text-transform: uppercase;
+        }
+
+        .portfolio-status.active {
+          background: #ecfdf5;
+          color: #10b981;
+        }
+
+        .portfolio-status.draft {
+          background: #fef3c7;
+          color: #f59e0b;
+        }
+
+        .portfolio-url {
+          margin-top: 16px;
+        }
+
+        .portfolio-url label {
+          display: block;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: var(--dark-charcoal);
+          margin-bottom: 8px;
+        }
+
+        .url-display {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 12px;
+          background: #f9fafb;
+          border-radius: 8px;
+          border: 1px solid var(--light-gray);
+        }
+
+        .url-display code {
+          flex: 1;
+          font-size: 0.85rem;
+          color: var(--electric-blue);
+          font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .copy-btn {
+          background: none;
+          border: none;
+          color: var(--dark-charcoal);
+          opacity: 0.6;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+          opacity: 1;
+          background: var(--light-gray);
+        }
+
+        .section-list {
+          space-y: 8px;
+        }
+
+        .section-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          font-size: 0.9rem;
+        }
+
+        .subsection-count {
+          color: var(--dark-charcoal);
+          opacity: 0.6;
+          font-size: 0.8rem;
+        }
+
+        .portfolio-stats {
+          space-y: 8px;
+        }
+
+        .stat-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          font-size: 0.9rem;
+        }
+
+        .stat-item span:first-child {
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+        }
+
+        .stat-item span:last-child {
+          font-weight: 500;
+          color: var(--dark-charcoal);
+        }
+
+        .portfolio-preview {
+          background: var(--white);
+          border-radius: 12px;
+          padding: 24px;
+          border: 1px solid var(--light-gray);
+        }
+
+        .preview-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .preview-header h3 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: var(--dark-charcoal);
+        }
+
+        .preview-content {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+
+        .preview-profile {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .preview-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: var(--light-gray);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+
+        .preview-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .preview-info h4 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: var(--dark-charcoal);
+          margin-bottom: 4px;
+        }
+
+        .preview-info p {
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+          font-size: 0.9rem;
+          margin-bottom: 2px;
+        }
+
+        .preview-contact {
+          font-size: 0.8rem !important;
+          color: var(--electric-blue) !important;
+          opacity: 1 !important;
+        }
+
+        .preview-sections {
+          space-y: 12px;
+        }
+
+        .preview-section {
+          padding: 12px;
+          background: #f9fafb;
+          border-radius: 8px;
+          border-left: 3px solid var(--electric-blue);
+        }
+
+        .preview-section h5 {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: var(--dark-charcoal);
+          margin-bottom: 4px;
+        }
+
+        .preview-section p {
+          font-size: 0.8rem;
+          color: var(--dark-charcoal);
+          opacity: 0.6;
+        }
+
+        .preview-empty {
+          color: var(--dark-charcoal);
+          opacity: 0.5;
+          font-style: italic;
+          text-align: center;
+          padding: 20px;
+        }
+
+        .portfolio-empty {
+          text-align: center;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 64px 32px;
+        }
+
+        .portfolio-empty .empty-icon {
+          color: #9ca3af;
+          margin-bottom: 32px;
+        }
+
+        .portfolio-empty h3 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--dark-charcoal);
+          margin-bottom: 16px;
+        }
+
+        .portfolio-empty > p {
+          font-size: 1.1rem;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+          margin-bottom: 48px;
+          line-height: 1.6;
+        }
+
+        .portfolio-features {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 24px;
+          margin-bottom: 48px;
+          text-align: left;
+        }
+
+        .feature-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          padding: 20px;
+          background: #f9fafb;
+          border-radius: 12px;
+          border: 1px solid var(--light-gray);
+        }
+
+        .feature-icon {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, var(--electric-blue), var(--purple));
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          flex-shrink: 0;
+        }
+
+        .feature-content h4 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--dark-charcoal);
+          margin-bottom: 8px;
+        }
+
+        .feature-content p {
+          font-size: 0.9rem;
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+          line-height: 1.5;
+        }
+
+        .btn-large {
+          padding: 16px 32px;
+          font-size: 1.1rem;
+          font-weight: 600;
         }
       `}</style>
     </div>

@@ -285,11 +285,17 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
 // Save/Update user profile endpoint (POST for compatibility)
 app.post('/api/profile', authenticateToken, async (req, res) => {
   try {
-    const { profileData, appearanceData } = req.body;
+    const { profileData, appearanceData, portfolioData } = req.body;
     
     const updateData = {};
     if (profileData) updateData.profileData = profileData;
     if (appearanceData) updateData.appearanceData = appearanceData;
+    if (portfolioData) {
+      updateData.portfolioData = {
+        ...portfolioData,
+        lastUpdated: new Date()
+      };
+    }
     updateData.lastProfileUpdate = new Date();
 
     const user = await User.findByIdAndUpdate(

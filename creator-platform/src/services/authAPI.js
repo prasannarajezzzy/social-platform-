@@ -80,10 +80,10 @@ class AuthAPIService {
   }
 
   // Profile Management
-  async saveProfile(profileData, appearanceData) {
+  async saveProfile(profileData, appearanceData, portfolioData) {
     return await this.makeRequest('/profile', {
       method: 'POST',
-      body: JSON.stringify({ profileData, appearanceData }),
+      body: JSON.stringify({ profileData, appearanceData, portfolioData }),
     });
   }
 
