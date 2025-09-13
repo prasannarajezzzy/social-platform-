@@ -21,6 +21,7 @@ const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
         process.env.FRONTEND_URL,
+        'https://social-platform-five.vercel.app',
         'https://your-frontend-domain.vercel.app',
         /\.vercel\.app$/,
         /\.netlify\.app$/

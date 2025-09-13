@@ -5,7 +5,7 @@ const config = {
   },
   production: {
     // This will be set during build time via environment variables
-    API_BASE_URL: process.env.REACT_APP_API_URL || 'https://your-backend-url.railway.app'
+    API_BASE_URL: process.env.REACT_APP_API_URL || 'https://social-platform-production.up.railway.app'
   }
 };
 
