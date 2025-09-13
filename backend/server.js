@@ -22,13 +22,16 @@ const corsOptions = {
     ? [
         process.env.FRONTEND_URL,
         'https://social-platform-five.vercel.app',
+        'https://social-platform-ch61hj9i7-prasannarajezzzys-projects.vercel.app',
         'https://your-frontend-domain.vercel.app',
         /\.vercel\.app$/,
         /\.netlify\.app$/
       ]
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
