@@ -2,13 +2,13 @@
 NODE_ENV = "production"
 
 [phases.setup]
-nixPkgs = ["nodejs", "npm"]
+nixPkgs = ["nodejs_18", "npm"]
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["npm install --production=false"]
 
 [phases.build]
-cmds = ["echo 'Build complete'"]
+cmds = ["echo 'Build phase complete'"]
 
 [start]
 cmd = "npm start"
