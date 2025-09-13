@@ -319,7 +319,7 @@ const ProfilePage = () => {
         </h3>
         
         <div className="social-links-grid">
-          {Object.entries(profileData.socialLinks).map(([platform, value]) => {
+          {Object.entries(profileData.socialLinks || {}).map(([platform, value]) => {
             const Icon = getSocialIcon(platform);
             return (
               <div key={platform} className="social-link-item">
@@ -331,7 +331,7 @@ const ProfilePage = () => {
                   <input
                     type="text"
                     className="form-input"
-                    value={value}
+                    value={value || ''}
                     onChange={(e) => handleSocialLinkChange(platform, e.target.value)}
                     placeholder={platform === 'website' ? 'https://yourwebsite.com' : `@username`}
                   />
