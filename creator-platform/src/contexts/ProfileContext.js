@@ -15,6 +15,7 @@ export const ProfileProvider = ({ children }) => {
   const [profileData, setProfileData] = useState({
     profileImage: null,
     profileImageUrl: '',
+    name: '',
     title: '',
     bio: '',
     username: '',
@@ -60,6 +61,7 @@ export const ProfileProvider = ({ children }) => {
         setProfileData({
           profileImage: null, // File objects can't be stored in backend
           profileImageUrl: response.profile.profileData?.profileImageUrl || '',
+          name: response.profile.name || '', // Name is stored at user level, not in profileData
           title: response.profile.profileData?.title || '',
           bio: response.profile.profileData?.bio || '',
           username: response.profile.username || '',
@@ -330,10 +332,11 @@ export const ProfileProvider = ({ children }) => {
     setIsLoading(true);
     try {
       if (authAPI.isAuthenticated()) {
-        // Prepare profile data for backend (exclude File objects)
+        // Prepare profile data for backend (exclude File objects and name)
         const backendProfileData = {
           ...profileData,
-          profileImage: undefined // Remove File object, keep only profileImageUrl
+          profileImage: undefined, // Remove File object, keep only profileImageUrl
+          name: undefined // Name is stored at user level, not in profileData
         };
         
         // Save to backend API
@@ -361,6 +364,7 @@ export const ProfileProvider = ({ children }) => {
     setProfileData({
       profileImage: null,
       profileImageUrl: '',
+      name: '',
       title: '',
       bio: '',
       username: '',
