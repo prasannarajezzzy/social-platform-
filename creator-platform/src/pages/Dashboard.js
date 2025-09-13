@@ -21,21 +21,25 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { profileData } = useProfile();
+  const { profileData, analyticsData, loadAnalytics } = useProfile();
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Get actual data from profile
+  // Get actual data from profile and analytics
   const customLinks = profileData.customLinks || [];
   const activeLinks = customLinks.filter(link => link.isActive);
   const totalClicks = customLinks.reduce((sum, link) => sum + (link.clicks || 0), 0);
   const averageClickRate = customLinks.length > 0 ? (totalClicks / customLinks.length).toFixed(1) : 0;
   
-  // Calculate actual stats
+  // Use analytics data from backend if available, fallback to local calculations
   const stats = {
-    totalClicks: totalClicks,
+    totalClicks: analyticsData?.linkClicks?.total || totalClicks,
+    profileViews: analyticsData?.profileViews?.total || 0,
     activeLinks: activeLinks.length,
     totalLinks: customLinks.length,
-    clickRate: averageClickRate
+    clickRate: averageClickRate,
+    conversionRate: analyticsData?.conversionRate || 0,
+    viewsLast7Days: analyticsData?.profileViews?.last7Days || 0,
+    clicksLast7Days: analyticsData?.linkClicks?.last7Days || 0
   };
 
   const products = [
@@ -92,9 +96,19 @@ const Dashboard = () => {
             <Eye size={24} />
           </div>
           <div className="stat-info">
+            <div className="stat-number">{stats.profileViews.toLocaleString()}</div>
+            <div className="stat-label">Profile Views</div>
+            <div className="stat-change positive">+{stats.viewsLast7Days} this week</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">
+            <BarChart3 size={24} />
+          </div>
+          <div className="stat-info">
             <div className="stat-number">{stats.totalClicks.toLocaleString()}</div>
             <div className="stat-label">Total Clicks</div>
-            <div className="stat-change positive">All time</div>
+            <div className="stat-change positive">+{stats.clicksLast7Days} this week</div>
           </div>
         </div>
         <div className="stat-card">

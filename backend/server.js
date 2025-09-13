@@ -252,7 +252,74 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
   }
 });
 
-// Update user profile endpoint
+// Get user profile endpoint
+app.get('/api/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+
+    res.json({
+      success: true,
+      profile: {
+        username: user.username,
+        profileData: user.profileData,
+        appearanceData: user.appearanceData,
+        analytics: user.analytics,
+        settings: user.settings
+      }
+    });
+
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Save/Update user profile endpoint (POST for compatibility)
+app.post('/api/profile', authenticateToken, async (req, res) => {
+  try {
+    const { profileData, appearanceData } = req.body;
+    
+    const updateData = {};
+    if (profileData) updateData.profileData = profileData;
+    if (appearanceData) updateData.appearanceData = appearanceData;
+    updateData.lastProfileUpdate = new Date();
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Profile saved successfully',
+      profileData: user.profileData,
+      appearanceData: user.appearanceData
+    });
+
+  } catch (error) {
+    console.error('Profile save error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Update user profile endpoint (PUT for RESTful compliance)
 app.put('/api/profile', authenticateToken, async (req, res) => {
   try {
     const { profileData, appearanceData } = req.body;

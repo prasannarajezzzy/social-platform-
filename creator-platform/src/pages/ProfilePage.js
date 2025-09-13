@@ -639,11 +639,10 @@ const ProfilePage = () => {
       <div className="preview-header">
         <h3>Live Preview</h3>
         <button 
-          className="btn btn-ghost"
+          className="close-preview-btn"
           onClick={() => setPreviewMode(false)}
         >
-          <X size={16} />
-          Close Preview
+          <X size={20} />
         </button>
       </div>
       
@@ -1227,6 +1226,7 @@ const ProfilePage = () => {
           justify-content: center;
           z-index: 1000;
           padding: 20px;
+          flex-direction: column;
         }
 
         .preview-content {
@@ -1240,18 +1240,70 @@ const ProfilePage = () => {
         }
 
         .preview-header {
+          width: 100%;
+          background: white;
+          border-radius: 13px 13px 0px 0px;
           display: flex;
+          color: black;
+          padding: 7px 11px;
+          background: black;
+          max-width: 400px;
           justify-content: space-between;
-          align-items: center;
-          margin-bottom: 24px;
-          padding-bottom: 16px;
-          border-bottom: 1px solid #e5e7eb;
         }
 
         .preview-header h3 {
           font-size: 1.25rem;
           font-weight: 600;
           color: #1f2937;
+        }
+
+        .close-preview-btn {
+          width: 40px;
+          height: 40px;
+          border: none;
+          border-radius: 50%;
+          background: rgba(107, 114, 128, 0.1);
+          color: #6b7280;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .close-preview-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(107, 114, 128, 0.1);
+          border-radius: 50%;
+          transform: scale(0);
+          transition: transform 0.2s ease;
+        }
+
+        .close-preview-btn:hover {
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+          transform: scale(1.05);
+        }
+
+        .close-preview-btn:hover::before {
+          transform: scale(1);
+          background: rgba(239, 68, 68, 0.05);
+        }
+
+        .close-preview-btn:active {
+          transform: scale(0.95);
+        }
+
+        .close-preview-btn:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
 
         .profile-preview {

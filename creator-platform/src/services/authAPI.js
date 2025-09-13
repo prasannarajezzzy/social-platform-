@@ -79,6 +79,54 @@ class AuthAPIService {
     return await this.makeRequest('/auth/me');
   }
 
+  // Profile Management
+  async saveProfile(profileData, appearanceData) {
+    return await this.makeRequest('/profile', {
+      method: 'POST',
+      body: JSON.stringify({ profileData, appearanceData }),
+    });
+  }
+
+  async getFullProfile() {
+    return await this.makeRequest('/profile');
+  }
+
+  async updateCustomLink(linkId, linkData) {
+    return await this.makeRequest(`/profile/links/${linkId}`, {
+      method: 'PUT',
+      body: JSON.stringify(linkData),
+    });
+  }
+
+  async addCustomLink(linkData) {
+    return await this.makeRequest('/profile/links', {
+      method: 'POST',
+      body: JSON.stringify(linkData),
+    });
+  }
+
+  async deleteCustomLink(linkId) {
+    return await this.makeRequest(`/profile/links/${linkId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async trackLinkClick(linkId, clickData = {}) {
+    return await this.makeRequest(`/profile/track-click/${linkId}`, {
+      method: 'POST',
+      body: JSON.stringify(clickData),
+    });
+  }
+
+  // Analytics
+  async getAnalytics() {
+    return await this.makeRequest('/analytics');
+  }
+
+  async getLinkAnalytics(linkId) {
+    return await this.makeRequest(`/analytics/links/${linkId}`);
+  }
+
   logout() {
     localStorage.removeItem('authToken');
   }

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { authAPI } from '../services/authAPI';
 
 const ProfileContext = createContext();
 
@@ -41,9 +42,68 @@ export const ProfileProvider = ({ children }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState(null);
 
-  // Load profile data from localStorage on mount
+  const loadProfileFromBackend = useCallback(async () => {
+    if (!authAPI.isAuthenticated()) {
+      // If not authenticated, load from localStorage as fallback
+      loadFromLocalStorage();
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await authAPI.getFullProfile();
+      
+      if (response.profile) {
+        // Map backend data to frontend state
+        setProfileData({
+          profileImage: null, // File objects can't be stored in backend
+          profileImageUrl: response.profile.profileData?.profileImageUrl || '',
+          title: response.profile.profileData?.title || '',
+          bio: response.profile.profileData?.bio || '',
+          username: response.profile.username || '',
+          socialLinks: response.profile.profileData?.socialLinks || {
+            instagram: '',
+            twitter: '',
+            youtube: '',
+            linkedin: '',
+            github: '',
+            facebook: '',
+            tiktok: '',
+            website: ''
+          },
+          customLinks: response.profile.profileData?.customLinks || []
+        });
+
+        setAppearanceData({
+          theme: response.profile.appearanceData?.theme || 'lake-white',
+          brandColor: response.profile.appearanceData?.brandColor || '#667eea',
+          backgroundColor: response.profile.appearanceData?.backgroundColor || '#ffffff',
+          buttonStyle: response.profile.appearanceData?.buttonStyle || 'rounded',
+          buttonLayout: response.profile.appearanceData?.buttonLayout || 'stack',
+          font: response.profile.appearanceData?.font || 'inter',
+          customCSS: response.profile.appearanceData?.customCSS || ''
+        });
+
+        // Load analytics data
+        await loadAnalytics();
+      }
+    } catch (error) {
+      console.error('Error loading profile from backend:', error);
+      // Fallback to localStorage if backend fails
+      loadFromLocalStorage();
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Load profile data from backend on mount
   useEffect(() => {
+    loadProfileFromBackend();
+  }, [loadProfileFromBackend]);
+
+  const loadFromLocalStorage = () => {
     const savedProfile = localStorage.getItem('userProfile');
     const savedAppearance = localStorage.getItem('userAppearance');
     
@@ -51,7 +111,7 @@ export const ProfileProvider = ({ children }) => {
       try {
         setProfileData(JSON.parse(savedProfile));
       } catch (error) {
-        console.error('Error loading profile data:', error);
+        console.error('Error loading profile data from localStorage:', error);
       }
     }
     
@@ -59,12 +119,21 @@ export const ProfileProvider = ({ children }) => {
       try {
         setAppearanceData(JSON.parse(savedAppearance));
       } catch (error) {
-        console.error('Error loading appearance data:', error);
+        console.error('Error loading appearance data from localStorage:', error);
       }
     }
-  }, []);
+  };
 
-  // Save to localStorage whenever data changes
+  const loadAnalytics = async () => {
+    try {
+      const analytics = await authAPI.getAnalytics();
+      setAnalyticsData(analytics.analytics);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    }
+  };
+
+  // Save to localStorage for offline access (keep as backup)
   useEffect(() => {
     localStorage.setItem('userProfile', JSON.stringify(profileData));
   }, [profileData]);
@@ -90,37 +159,120 @@ export const ProfileProvider = ({ children }) => {
     }));
   };
 
-  const addCustomLink = (link) => {
-    const newLink = {
-      id: Date.now().toString(),
-      title: link.title,
-      url: link.url,
-      description: link.description || '',
-      icon: link.icon || 'ExternalLink',
-      isActive: true,
-      clicks: 0
-    };
-    
-    setProfileData(prev => ({
-      ...prev,
-      customLinks: [...prev.customLinks, newLink]
-    }));
+  const addCustomLink = async (link) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        // Add to backend first
+        const response = await authAPI.addCustomLink(link);
+        if (response.link) {
+          // Update local state with backend response
+          setProfileData(prev => ({
+            ...prev,
+            customLinks: [...prev.customLinks, response.link]
+          }));
+          return response.link;
+        }
+      } else {
+        // Fallback to local-only for non-authenticated users
+        const newLink = {
+          id: Date.now().toString(),
+          title: link.title,
+          url: link.url,
+          description: link.description || '',
+          icon: link.icon || 'ExternalLink',
+          isActive: true,
+          clicks: 0
+        };
+        
+        setProfileData(prev => ({
+          ...prev,
+          customLinks: [...prev.customLinks, newLink]
+        }));
+        return newLink;
+      }
+    } catch (error) {
+      console.error('Error adding custom link:', error);
+      // Fallback to local state on error
+      const newLink = {
+        id: Date.now().toString(),
+        title: link.title,
+        url: link.url,
+        description: link.description || '',
+        icon: link.icon || 'ExternalLink',
+        isActive: true,
+        clicks: 0
+      };
+      
+      setProfileData(prev => ({
+        ...prev,
+        customLinks: [...prev.customLinks, newLink]
+      }));
+      return newLink;
+    }
   };
 
-  const updateCustomLink = (linkId, updates) => {
-    setProfileData(prev => ({
-      ...prev,
-      customLinks: prev.customLinks.map(link => 
-        link.id === linkId ? { ...link, ...updates } : link
-      )
-    }));
+  const updateCustomLink = async (linkId, updates) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        // Update backend first
+        const response = await authAPI.updateCustomLink(linkId, updates);
+        if (response.message && response.link) {
+          // Update local state with the response from backend
+          setProfileData(prev => ({
+            ...prev,
+            customLinks: prev.customLinks.map(link => 
+              link.id === linkId ? response.link : link
+            )
+          }));
+        }
+      } else {
+        // Update local state only
+        setProfileData(prev => ({
+          ...prev,
+          customLinks: prev.customLinks.map(link => 
+            link.id === linkId ? { ...link, ...updates } : link
+          )
+        }));
+      }
+    } catch (error) {
+      console.error('Error updating custom link:', error);
+      // Update local state as fallback
+      setProfileData(prev => ({
+        ...prev,
+        customLinks: prev.customLinks.map(link => 
+          link.id === linkId ? { ...link, ...updates } : link
+        )
+      }));
+    }
   };
 
-  const deleteCustomLink = (linkId) => {
-    setProfileData(prev => ({
-      ...prev,
-      customLinks: prev.customLinks.filter(link => link.id !== linkId)
-    }));
+  const deleteCustomLink = async (linkId) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        // Delete from backend first
+        const response = await authAPI.deleteCustomLink(linkId);
+        if (response.message) {
+          // Update local state
+          setProfileData(prev => ({
+            ...prev,
+            customLinks: prev.customLinks.filter(link => link.id !== linkId)
+          }));
+        }
+      } else {
+        // Update local state only
+        setProfileData(prev => ({
+          ...prev,
+          customLinks: prev.customLinks.filter(link => link.id !== linkId)
+        }));
+      }
+    } catch (error) {
+      console.error('Error deleting custom link:', error);
+      // Update local state as fallback
+      setProfileData(prev => ({
+        ...prev,
+        customLinks: prev.customLinks.filter(link => link.id !== linkId)
+      }));
+    }
   };
 
   const reorderCustomLinks = (fromIndex, toIndex) => {
@@ -135,15 +287,36 @@ export const ProfileProvider = ({ children }) => {
     });
   };
 
-  const trackLinkClick = (linkId) => {
-    setProfileData(prev => ({
-      ...prev,
-      customLinks: prev.customLinks.map(link => 
-        link.id === linkId 
-          ? { ...link, clicks: (link.clicks || 0) + 1 }
-          : link
-      )
-    }));
+  const trackLinkClick = async (linkId, clickData = {}) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        // Track click on backend
+        await authAPI.trackLinkClick(linkId, clickData);
+        // Reload analytics to get updated data
+        await loadAnalytics();
+      }
+      
+      // Update local state regardless
+      setProfileData(prev => ({
+        ...prev,
+        customLinks: prev.customLinks.map(link => 
+          link.id === linkId 
+            ? { ...link, clicks: (link.clicks || 0) + 1 }
+            : link
+        )
+      }));
+    } catch (error) {
+      console.error('Error tracking link click:', error);
+      // Update local state as fallback
+      setProfileData(prev => ({
+        ...prev,
+        customLinks: prev.customLinks.map(link => 
+          link.id === linkId 
+            ? { ...link, clicks: (link.clicks || 0) + 1 }
+            : link
+        )
+      }));
+    }
   };
 
   const updateAppearance = (updates) => {
@@ -156,14 +329,26 @@ export const ProfileProvider = ({ children }) => {
   const saveProfile = async () => {
     setIsLoading(true);
     try {
-      // In a real app, this would save to your backend API
-      // await profileAPI.saveProfile({ profileData, appearanceData });
-      
-      // For now, we'll just simulate an API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Profile saved successfully');
-      return { success: true };
+      if (authAPI.isAuthenticated()) {
+        // Prepare profile data for backend (exclude File objects)
+        const backendProfileData = {
+          ...profileData,
+          profileImage: undefined // Remove File object, keep only profileImageUrl
+        };
+        
+        // Save to backend API
+        const response = await authAPI.saveProfile(backendProfileData, appearanceData);
+        if (response.success) {
+          console.log('Profile saved successfully to backend');
+          return { success: true };
+        } else {
+          throw new Error(response.error || 'Failed to save profile');
+        }
+      } else {
+        // For non-authenticated users, just keep in localStorage
+        console.log('Profile saved to localStorage (user not authenticated)');
+        return { success: true };
+      }
     } catch (error) {
       console.error('Error saving profile:', error);
       return { success: false, error: error.message };
@@ -268,6 +453,7 @@ export const ProfileProvider = ({ children }) => {
   const value = {
     profileData,
     appearanceData,
+    analyticsData,
     isLoading,
     updateProfile,
     updateSocialLink,
@@ -282,7 +468,9 @@ export const ProfileProvider = ({ children }) => {
     updateCustomLink,
     deleteCustomLink,
     reorderCustomLinks,
-    trackLinkClick
+    trackLinkClick,
+    loadProfileFromBackend,
+    loadAnalytics
   };
 
   return (
@@ -293,3 +481,4 @@ export const ProfileProvider = ({ children }) => {
 };
 
 export default ProfileContext;
+
