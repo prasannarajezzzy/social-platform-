@@ -182,7 +182,17 @@ const RegisterPage = () => {
       
       navigate('/dashboard');
     } catch (error) {
-      setErrors({ general: error.message || 'Registration failed. Please try again.' });
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error.message.includes('User with this email already exists')) {
+        errorMessage = 'An account with this email already exists. Please try logging in instead or use a different email address.';
+      } else if (error.message.includes('Validation failed')) {
+        errorMessage = 'Please check your input and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -245,6 +255,13 @@ const RegisterPage = () => {
                 {errors.general && (
                   <div className="error-banner">
                     {errors.general}
+                    {errors.general.includes('account with this email already exists') && (
+                      <div className="mt-3">
+                        <Link to="/login" className="text-blue-600 hover:text-blue-800 underline">
+                          Click here to login instead
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
 

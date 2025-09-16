@@ -44,6 +44,7 @@ export const ProfileProvider = ({ children }) => {
 
   const [portfolioData, setPortfolioData] = useState({
     isPortfolioEnabled: false,
+    profileName: 'My Portfolio',
     fullName: '',
     portfolioUsername: '',
     resumeUrl: '',
@@ -54,8 +55,27 @@ export const ProfileProvider = ({ children }) => {
     },
     sections: [],
     theme: 'professional',
-    isPublic: false
+    isPublic: false,
+        appearance: {
+          portfolioMode: 'professional',
+          colorScheme: 'blue',
+          layout: 'modern',
+          fontFamily: 'inter',
+          fontSize: 'medium',
+          backgroundType: 'solid',
+          backgroundColor: '#ffffff',
+          backgroundPattern: '',
+          textColor: '#1f2937',
+          cardBorderRadius: 'medium',
+          cardShadow: 'medium',
+          subsectionLayout: 'grid',
+          cardDensity: 'comfortable',
+          customCSS: ''
+        }
   });
+
+  const [portfolioProfiles, setPortfolioProfiles] = useState([]);
+  const [currentProfileId, setCurrentProfileId] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -103,20 +123,49 @@ export const ProfileProvider = ({ children }) => {
           customCSS: response.profile.appearanceData?.customCSS || ''
         });
 
-        setPortfolioData({
-          isPortfolioEnabled: response.profile.portfolioData?.isPortfolioEnabled || false,
-          fullName: response.profile.portfolioData?.fullName || '',
-          portfolioUsername: response.profile.portfolioData?.portfolioUsername || '',
-          resumeUrl: response.profile.portfolioData?.resumeUrl || '',
-          contactInfo: {
-            phone: response.profile.portfolioData?.contactInfo?.phone || '',
-            email: response.profile.portfolioData?.contactInfo?.email || '',
-            additionalContacts: response.profile.portfolioData?.contactInfo?.additionalContacts || []
-          },
-          sections: response.profile.portfolioData?.sections || [],
-          theme: response.profile.portfolioData?.theme || 'professional',
-          isPublic: response.profile.portfolioData?.isPublic || false
-        });
+        // Load portfolio profiles
+        const profiles = response.profile.portfolioProfiles || [];
+        setPortfolioProfiles(profiles);
+        
+        // Find default profile or use first profile
+        const defaultProfile = profiles.find(p => p.isDefault) || profiles[0];
+        if (defaultProfile) {
+          setCurrentProfileId(defaultProfile.id);
+          setPortfolioData(defaultProfile.portfolioData);
+        } else {
+          // Fallback to main portfolioData if no profiles exist
+          setPortfolioData({
+            isPortfolioEnabled: response.profile.portfolioData?.isPortfolioEnabled || false,
+            profileName: response.profile.portfolioData?.profileName || 'My Portfolio',
+            fullName: response.profile.portfolioData?.fullName || '',
+            portfolioUsername: response.profile.portfolioData?.portfolioUsername || '',
+            resumeUrl: response.profile.portfolioData?.resumeUrl || '',
+            contactInfo: {
+              phone: response.profile.portfolioData?.contactInfo?.phone || '',
+              email: response.profile.portfolioData?.contactInfo?.email || '',
+              additionalContacts: response.profile.portfolioData?.contactInfo?.additionalContacts || []
+            },
+            sections: response.profile.portfolioData?.sections || [],
+            theme: response.profile.portfolioData?.theme || 'professional',
+            isPublic: response.profile.portfolioData?.isPublic || false,
+            appearance: {
+              portfolioMode: response.profile.portfolioData?.appearance?.portfolioMode || 'professional',
+              colorScheme: response.profile.portfolioData?.appearance?.colorScheme || 'blue',
+              layout: response.profile.portfolioData?.appearance?.layout || 'modern',
+              fontFamily: response.profile.portfolioData?.appearance?.fontFamily || 'inter',
+              fontSize: response.profile.portfolioData?.appearance?.fontSize || 'medium',
+              backgroundType: response.profile.portfolioData?.appearance?.backgroundType || 'solid',
+              backgroundColor: response.profile.portfolioData?.appearance?.backgroundColor || '#ffffff',
+              backgroundPattern: response.profile.portfolioData?.appearance?.backgroundPattern || '',
+              textColor: response.profile.portfolioData?.appearance?.textColor || '#1f2937',
+              cardBorderRadius: response.profile.portfolioData?.appearance?.cardBorderRadius || 'medium',
+              cardShadow: response.profile.portfolioData?.appearance?.cardShadow || 'medium',
+              subsectionLayout: response.profile.portfolioData?.appearance?.subsectionLayout || 'grid',
+              cardDensity: response.profile.portfolioData?.appearance?.cardDensity || 'comfortable',
+              customCSS: response.profile.portfolioData?.appearance?.customCSS || ''
+            }
+          });
+        }
 
         // Load analytics data
         await loadAnalytics();
@@ -369,14 +418,22 @@ export const ProfileProvider = ({ children }) => {
           name: undefined // Name is stored at user level, not in profileData
         };
         
-        // Save to backend API
-        const response = await authAPI.saveProfile(backendProfileData, appearanceData, portfolioData);
-        if (response.success) {
-          console.log('Profile saved successfully to backend');
-          return { success: true };
+        // If we have a current profile, update it; otherwise save to main portfolioData
+        if (currentProfileId) {
+          await updatePortfolioProfile(currentProfileId, { portfolioData });
         } else {
-          throw new Error(response.error || 'Failed to save profile');
+          // Save to backend API
+          const response = await authAPI.saveProfile(backendProfileData, appearanceData, portfolioData);
+          if (response.success) {
+            console.log('Profile saved successfully to backend');
+            return { success: true };
+          } else {
+            throw new Error(response.error || 'Failed to save profile');
+          }
         }
+        
+        console.log('Portfolio profile saved successfully');
+        return { success: true };
       } else {
         // For non-authenticated users, just keep in localStorage
         console.log('Profile saved to localStorage (user not authenticated)');
@@ -706,10 +763,229 @@ export const ProfileProvider = ({ children }) => {
     }));
   };
 
+  // Portfolio Profile Management Functions
+  const createPortfolioProfile = async (name, description, portfolioData) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        console.log('Creating portfolio profile:', { name, description, portfolioData });
+        const response = await authAPI.createPortfolioProfile({ name, description, portfolioData });
+        console.log('Portfolio profile creation response:', response);
+        if (response.profile) {
+          setPortfolioProfiles(prev => [...prev, response.profile]);
+          // Set the newly created profile as the current profile
+          setCurrentProfileId(response.profile.id);
+          return response.profile;
+        }
+      } else {
+        // Fallback for non-authenticated users
+        const newProfile = {
+          id: Date.now().toString(),
+          name,
+          description: description || '',
+          isDefault: portfolioProfiles.length === 0,
+          isActive: true,
+          portfolioData: portfolioData || {
+            isPortfolioEnabled: true,
+            profileName: 'My Portfolio',
+            fullName: '',
+            portfolioUsername: '',
+            resumeUrl: '',
+            contactInfo: { phone: '', email: '', additionalContacts: [] },
+            sections: [],
+            theme: 'professional',
+            isPublic: false,
+            appearance: {
+              portfolioMode: 'professional',
+              colorScheme: 'blue',
+              layout: 'modern',
+              fontFamily: 'inter',
+              fontSize: 'medium',
+              backgroundType: 'solid',
+              backgroundColor: '#ffffff',
+              backgroundPattern: '',
+              textColor: '#1f2937',
+              cardBorderRadius: 'medium',
+              cardShadow: 'medium',
+              subsectionLayout: 'grid',
+              cardDensity: 'comfortable',
+              customCSS: ''
+            }
+          },
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        setPortfolioProfiles(prev => [...prev, newProfile]);
+        // Set the newly created profile as the current profile
+        setCurrentProfileId(newProfile.id);
+        return newProfile;
+      }
+    } catch (error) {
+      console.error('Error creating portfolio profile:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      throw error;
+    }
+  };
+
+  const updatePortfolioProfile = async (profileId, updates, retryCount = 0) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        const response = await authAPI.updatePortfolioProfile(profileId, updates);
+        if (response.profile) {
+          setPortfolioProfiles(prev => 
+            prev.map(profile => 
+              profile.id === profileId ? response.profile : profile
+            )
+          );
+          return response.profile;
+        }
+      } else {
+        // Update local state
+        setPortfolioProfiles(prev => 
+          prev.map(profile => 
+            profile.id === profileId ? { ...profile, ...updates, updatedAt: new Date() } : profile
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating portfolio profile:', error);
+      
+      // If profile not found and we haven't retried yet, wait a bit and try again
+      if (error.message.includes('Portfolio profile not found') && retryCount < 2) {
+        console.log(`Profile not found, retrying in 1 second... (attempt ${retryCount + 1})`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return updatePortfolioProfile(profileId, updates, retryCount + 1);
+      }
+      
+      // If profile not found after retries, refresh profiles and clear currentProfileId
+      if (error.message.includes('Portfolio profile not found')) {
+        console.log('Profile not found after retries, refreshing profiles...');
+        try {
+          const profilesResponse = await authAPI.getPortfolioProfiles();
+          if (profilesResponse.profiles) {
+            setPortfolioProfiles(profilesResponse.profiles);
+            // Clear currentProfileId if the profile doesn't exist
+            setCurrentProfileId(null);
+            throw new Error('Profile not found. Please select a different profile or create a new one.');
+          }
+        } catch (refreshError) {
+          console.error('Error refreshing profiles:', refreshError);
+        }
+      }
+      
+      throw error;
+    }
+  };
+
+  const deletePortfolioProfile = async (profileId) => {
+    try {
+      console.log('ProfileContext: Deleting portfolio profile with ID:', profileId);
+      console.log('ProfileContext: Current profiles:', portfolioProfiles);
+      
+      if (authAPI.isAuthenticated()) {
+        console.log('ProfileContext: Making API call to delete profile');
+        const response = await authAPI.deletePortfolioProfile(profileId);
+        console.log('ProfileContext: API response:', response);
+        
+        if (response.success) {
+          setPortfolioProfiles(prev => prev.filter(profile => profile.id !== profileId));
+          
+          // If deleted profile was current, switch to default
+          if (currentProfileId === profileId) {
+            const remainingProfiles = portfolioProfiles.filter(profile => profile.id !== profileId);
+            const defaultProfile = remainingProfiles.find(p => p.isDefault) || remainingProfiles[0];
+            if (defaultProfile) {
+              setCurrentProfileId(defaultProfile.id);
+              setPortfolioData(defaultProfile.portfolioData);
+            }
+          }
+        }
+      } else {
+        console.log('ProfileContext: Not authenticated, updating local state only');
+        // Update local state
+        setPortfolioProfiles(prev => prev.filter(profile => profile.id !== profileId));
+        
+        // If deleted profile was current, switch to default
+        if (currentProfileId === profileId) {
+          const remainingProfiles = portfolioProfiles.filter(profile => profile.id !== profileId);
+          const defaultProfile = remainingProfiles.find(p => p.isDefault) || remainingProfiles[0];
+          if (defaultProfile) {
+            setCurrentProfileId(defaultProfile.id);
+            setPortfolioData(defaultProfile.portfolioData);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting portfolio profile:', error);
+      throw error;
+    }
+  };
+
+  const switchToPortfolioProfile = (profileId) => {
+    const profile = portfolioProfiles.find(p => p.id === profileId);
+    if (profile) {
+      setCurrentProfileId(profileId);
+      setPortfolioData(profile.portfolioData);
+    }
+  };
+
+  const setDefaultPortfolioProfile = async (profileId) => {
+    try {
+      if (authAPI.isAuthenticated()) {
+        const response = await authAPI.setDefaultPortfolioProfile(profileId);
+        if (response.success) {
+          setPortfolioProfiles(prev => 
+            prev.map(profile => ({
+              ...profile,
+              isDefault: profile.id === profileId
+            }))
+          );
+        }
+      } else {
+        // Update local state
+        setPortfolioProfiles(prev => 
+          prev.map(profile => ({
+            ...profile,
+            isDefault: profile.id === profileId
+          }))
+        );
+      }
+    } catch (error) {
+      console.error('Error setting default portfolio profile:', error);
+      throw error;
+    }
+  };
+
+  const refreshPortfolioProfiles = async () => {
+    if (authAPI.isAuthenticated()) {
+      try {
+        const response = await authAPI.getPortfolioProfiles();
+        if (response.profiles) {
+          setPortfolioProfiles(response.profiles);
+          
+          // Check if currentProfileId still exists
+          const currentProfile = response.profiles.find(p => p.id === currentProfileId);
+          if (!currentProfile) {
+            // If current profile doesn't exist, set to default or first profile
+            const defaultProfile = response.profiles.find(p => p.isDefault) || response.profiles[0];
+            setCurrentProfileId(defaultProfile ? defaultProfile.id : null);
+          }
+        }
+      } catch (error) {
+        console.error('Error refreshing portfolio profiles:', error);
+      }
+    }
+  };
+
   const value = {
     profileData,
     appearanceData,
     portfolioData,
+    portfolioProfiles,
+    currentProfileId,
     analyticsData,
     isLoading,
     updateProfile,
@@ -741,7 +1017,14 @@ export const ProfileProvider = ({ children }) => {
     deleteBulletPoint,
     addAdditionalContact,
     updateAdditionalContact,
-    deleteAdditionalContact
+    deleteAdditionalContact,
+    // Portfolio Profile Management
+    createPortfolioProfile,
+    updatePortfolioProfile,
+    deletePortfolioProfile,
+    switchToPortfolioProfile,
+    setDefaultPortfolioProfile,
+    refreshPortfolioProfiles
   };
 
   return (

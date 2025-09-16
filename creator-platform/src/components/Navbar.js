@@ -23,6 +23,7 @@ const Navbar = () => {
   const authLinks = isAuthenticated 
     ? [
         { path: '/dashboard', label: 'Dashboard' },
+        { path: '/portfolio', label: 'Portfolio' },
         { onClick: handleLogout, label: 'Logout', icon: LogOut }
       ]
     : [
@@ -124,7 +125,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .navbar {
           background: var(--white);
           box-shadow: 0 2px 10px rgba(44, 44, 44, 0.1);

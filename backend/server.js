@@ -62,6 +62,13 @@ const authenticateToken = (req, res, next) => {
     if (err) {
       return res.status(403).json({ error: { message: 'Invalid or expired token' } });
     }
+    
+    // Debug logging for authentication
+    if (req.path.includes('portfolio-profiles')) {
+      console.log('🔧 AUTH DEBUG - Path:', req.path);
+      console.log('🔧 AUTH DEBUG - User from token:', user);
+    }
+    
     req.user = user;
     next();
   });
@@ -269,6 +276,8 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
         username: user.username,
         profileData: user.profileData,
         appearanceData: user.appearanceData,
+        portfolioData: user.portfolioData,
+        portfolioProfiles: user.portfolioProfiles || [],
         analytics: user.analytics,
         settings: user.settings
       }
@@ -667,6 +676,71 @@ app.get('/api/analytics/links/:linkId', authenticateToken, async (req, res) => {
   }
 });
 
+// Public portfolio endpoint (no authentication required)
+app.get('/api/public/portfolio/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    const user = await User.findOne({
+      'portfolioProfiles.portfolioData.portfolioUsername': username.toLowerCase(),
+      'portfolioProfiles.portfolioData.isPublic': true,
+      'portfolioProfiles.isActive': true,
+      isActive: true 
+    });
+    
+    if (!user) {
+      return res.status(404).json({
+        error: { message: 'Portfolio not found or private' }
+      });
+    }
+
+    // Find the specific portfolio profile
+    const portfolioProfile = user.portfolioProfiles.find(profile => 
+      profile.portfolioData.portfolioUsername === username.toLowerCase() && 
+      profile.isActive
+    );
+    
+    if (!portfolioProfile) {
+      return res.status(404).json({
+        error: { message: 'Portfolio not found or inactive' }
+      });
+    }
+
+    // Track portfolio view
+    portfolioProfile.portfolioData.portfolioViews = (portfolioProfile.portfolioData.portfolioViews || 0) + 1;
+    await user.save();
+
+    // Return public portfolio data (no sensitive information)
+    const publicPortfolio = {
+      id: portfolioProfile.id,
+      name: portfolioProfile.name,
+      description: portfolioProfile.description,
+      portfolioData: {
+        profileName: portfolioProfile.portfolioData.profileName,
+        fullName: portfolioProfile.portfolioData.fullName,
+        portfolioUsername: portfolioProfile.portfolioData.portfolioUsername,
+        resumeUrl: portfolioProfile.portfolioData.resumeUrl,
+        contactInfo: portfolioProfile.portfolioData.contactInfo,
+        sections: portfolioProfile.portfolioData.sections || [],
+        appearance: portfolioProfile.portfolioData.appearance,
+        theme: portfolioProfile.portfolioData.theme,
+        portfolioViews: portfolioProfile.portfolioData.portfolioViews || 0,
+        lastUpdated: portfolioProfile.portfolioData.lastUpdated
+      },
+      createdAt: portfolioProfile.createdAt,
+      updatedAt: portfolioProfile.updatedAt
+    };
+
+    res.json(publicPortfolio);
+
+  } catch (error) {
+    console.error('Public portfolio fetch error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
 // Public profile endpoint (no authentication required)
 app.get('/api/public/profile/:username', async (req, res) => {
   try {
@@ -731,6 +805,427 @@ app.get('/api/public/profile/:username', async (req, res) => {
 
   } catch (error) {
     console.error('Public profile fetch error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Portfolio Profiles Management Endpoints
+
+// Get all portfolio profiles
+app.get('/api/portfolio-profiles', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+
+    res.json({
+      success: true,
+      profiles: user.portfolioProfiles || []
+    });
+
+  } catch (error) {
+    console.error('Portfolio profiles fetch error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Create new portfolio profile
+app.post('/api/portfolio-profiles', authenticateToken, [
+  body('name').trim().isLength({ min: 1 }).withMessage('Profile name is required'),
+  body('portfolioUsername').optional().trim().isLength({ min: 3, max: 30 }).withMessage('Portfolio username must be between 3-30 characters').matches(/^[a-zA-Z0-9_-]+$/).withMessage('Portfolio username can only contain letters, numbers, underscores, and hyphens')
+], async (req, res) => {
+  try {
+    console.log('Backend: Creating portfolio profile');
+    console.log('Backend: Request body:', req.body);
+    console.log('Backend: User ID:', req.user?.id);
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log('Backend: Validation errors:', errors.array());
+      return res.status(400).json({
+        error: {
+          message: 'Validation failed',
+          details: errors.array()
+        }
+      });
+    }
+
+    const { name, description, portfolioData, portfolioUsername } = req.body;
+    console.log('Backend: Extracted data:', { name, description, portfolioUsername, portfolioData: portfolioData ? 'present' : 'missing' });
+    if (portfolioData && portfolioData.sections) {
+      console.log('Backend: Original sections:', portfolioData.sections.map(s => ({ id: s.id, title: s.title, sectionName: s.sectionName })));
+    }
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      console.log('Backend: User not found');
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+    console.log('Backend: User found, current portfolio profiles count:', user.portfolioProfiles?.length || 0);
+
+    // Check if portfolio username is already taken
+    if (portfolioUsername) {
+      const existingPortfolio = await User.findOne({
+        'portfolioProfiles.portfolioData.portfolioUsername': portfolioUsername.toLowerCase(),
+        _id: { $ne: req.user.id }
+      });
+      
+      if (existingPortfolio) {
+        return res.status(400).json({
+          error: { message: 'Portfolio username is already taken' }
+        });
+      }
+    }
+
+    // Initialize portfolioProfiles if not present
+    if (!user.portfolioProfiles) user.portfolioProfiles = [];
+
+    // Create new portfolio profile
+    const newProfile = {
+      id: Date.now().toString(),
+      name,
+      description: description || '',
+      isDefault: user.portfolioProfiles.length === 0, // First profile is default
+      isActive: true,
+      portfolioData: portfolioData ? {
+        ...portfolioData,
+        portfolioUsername: portfolioUsername ? portfolioUsername.toLowerCase() : '',
+        // Ensure sections have the correct field names for the schema
+        sections: portfolioData.sections ? portfolioData.sections.map(section => {
+          // Use title as sectionName since frontend sends title
+          const sectionName = section.title || section.id || 'Untitled Section';
+          return {
+            id: section.id,
+            sectionName: sectionName, // Required field for schema
+            title: section.title || sectionName, // Keep title for frontend compatibility
+            isVisible: section.isVisible !== undefined ? section.isVisible : true,
+            subsections: section.subsections || [],
+            bulletPoints: section.bulletPoints || [],
+            order: section.order || 0
+          };
+        }) : []
+      } : {
+        isPortfolioEnabled: true,
+        profileName: 'My Portfolio',
+        fullName: '',
+        portfolioUsername: portfolioUsername ? portfolioUsername.toLowerCase() : '',
+        resumeUrl: '',
+        contactInfo: {
+          phone: '',
+          email: '',
+          additionalContacts: []
+        },
+        sections: [],
+        theme: 'professional',
+        isPublic: false,
+        appearance: {
+          portfolioMode: 'professional',
+          colorScheme: 'blue',
+          layout: 'modern',
+          fontFamily: 'inter',
+          fontSize: 'medium',
+          backgroundType: 'solid',
+          backgroundColor: '#ffffff',
+          backgroundPattern: '',
+          textColor: '#1f2937',
+          cardBorderRadius: 'medium',
+          cardShadow: 'medium',
+          subsectionLayout: 'grid',
+          cardDensity: 'comfortable',
+          customCSS: ''
+        }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    console.log('Backend: Creating new profile object:', { id: newProfile.id, name: newProfile.name });
+    if (newProfile.portfolioData && newProfile.portfolioData.sections) {
+      console.log('Backend: Transformed sections:', newProfile.portfolioData.sections.map(s => ({ 
+        id: s.id, 
+        sectionName: s.sectionName, 
+        title: s.title 
+      })));
+    }
+    user.portfolioProfiles.push(newProfile);
+    console.log('Backend: Profile added to user, saving...');
+    
+    await user.save();
+    console.log('Backend: User saved successfully');
+
+    res.status(201).json({
+      success: true,
+      message: 'Portfolio profile created successfully',
+      profile: newProfile
+    });
+
+  } catch (error) {
+    console.error('Portfolio profile creation error:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Test route to check if PUT routes work
+app.put('/api/test-route', authenticateToken, async (req, res) => {
+  try {
+    console.log('🚨 TEST ROUTE HIT! 🚨');
+    res.json({ message: 'Test route working', user: req.user });
+  } catch (error) {
+    res.status(500).json({ error: { message: 'Test route error' } });
+  }
+});
+
+// Update portfolio profile
+app.put('/api/portfolio-profiles/:profileId', authenticateToken, [
+  body('portfolioUsername').optional().trim().isLength({ min: 3, max: 30 }).withMessage('Portfolio username must be between 3-30 characters').matches(/^[a-zA-Z0-9_-]+$/).withMessage('Portfolio username can only contain letters, numbers, underscores, and hyphens')
+], async (req, res) => {
+  try {
+    console.log('🚨 UPDATE ENDPOINT HIT! 🚨');
+    const { profileId } = req.params;
+    const { name, description, portfolioData, isDefault, isActive, portfolioUsername } = req.body;
+    
+    // Debug logging
+    console.log('🔧 UPDATE DEBUG - Profile ID:', profileId, 'Type:', typeof profileId);
+    console.log('🔧 UPDATE DEBUG - User ID:', req.user.id);
+    console.log('🔧 UPDATE DEBUG - Request body:', req.body);
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: {
+          message: 'Validation failed',
+          details: errors.array()
+        }
+      });
+    }
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      console.log('🔧 UPDATE DEBUG - User not found for ID:', req.user.id);
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+
+    console.log('🔧 UPDATE DEBUG - User found:', user.name);
+    console.log('🔧 UPDATE DEBUG - User portfolio profiles count:', user.portfolioProfiles?.length || 0);
+    
+    if (user.portfolioProfiles && user.portfolioProfiles.length > 0) {
+      console.log('🔧 UPDATE DEBUG - Available profile IDs:');
+      user.portfolioProfiles.forEach((p, index) => {
+        console.log(`   ${index + 1}. ID: ${p.id} (type: ${typeof p.id}), Name: ${p.name}`);
+      });
+    }
+
+    const profile = user.portfolioProfiles.find(p => p.id === profileId);
+    if (!profile) {
+      console.log('🔧 UPDATE DEBUG - Profile not found!');
+      console.log('🔧 UPDATE DEBUG - Looking for:', profileId, 'Type:', typeof profileId);
+      return res.status(404).json({
+        error: { message: 'Portfolio profile not found' }
+      });
+    }
+
+    console.log('🔧 UPDATE DEBUG - Profile found:', profile.name);
+
+    // Check if portfolio username is already taken (if changing username)
+    if (portfolioUsername && portfolioUsername !== profile.portfolioData.portfolioUsername) {
+      const existingPortfolio = await User.findOne({
+        'portfolioProfiles.portfolioData.portfolioUsername': portfolioUsername.toLowerCase(),
+        _id: { $ne: req.user.id }
+      });
+      
+      if (existingPortfolio) {
+        return res.status(400).json({
+          error: { message: 'Portfolio username is already taken' }
+        });
+      }
+    }
+
+    // Update profile properties
+    if (name !== undefined) profile.name = name;
+    if (description !== undefined) profile.description = description;
+    if (portfolioData !== undefined) {
+      profile.portfolioData = {
+        ...profile.portfolioData,
+        ...portfolioData,
+        portfolioUsername: portfolioUsername ? portfolioUsername.toLowerCase() : profile.portfolioData.portfolioUsername
+      };
+    }
+    if (portfolioUsername !== undefined) {
+      profile.portfolioData.portfolioUsername = portfolioUsername.toLowerCase();
+    }
+    if (isDefault !== undefined) profile.isDefault = isDefault;
+    if (isActive !== undefined) profile.isActive = isActive;
+    
+    profile.updatedAt = new Date();
+    
+    // If setting as default, unset other defaults
+    if (isDefault) {
+      user.portfolioProfiles.forEach(p => {
+        if (p.id !== profileId) p.isDefault = false;
+      });
+    }
+    
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Portfolio profile updated successfully',
+      profile: profile
+    });
+
+  } catch (error) {
+    console.error('Portfolio profile update error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Delete portfolio profile
+app.delete('/api/portfolio-profiles/:profileId', authenticateToken, async (req, res) => {
+  try {
+    const { profileId } = req.params;
+    console.log('Backend: Attempting to delete portfolio profile with ID:', profileId);
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      console.log('Backend: User not found');
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+
+    console.log('Backend: User found, portfolio profiles:', user.portfolioProfiles.map(p => ({ id: p.id, name: p.name })));
+    console.log('Backend: Looking for profile with ID:', profileId);
+
+    const profileIndex = user.portfolioProfiles.findIndex(p => p.id === profileId);
+    console.log('Backend: Profile index found:', profileIndex);
+    
+    if (profileIndex === -1) {
+      console.log('Backend: Portfolio profile not found');
+      return res.status(404).json({
+        error: { message: 'Portfolio profile not found' }
+      });
+    }
+
+    const deletedProfile = user.portfolioProfiles[profileIndex];
+    console.log('Backend: Profile to delete:', { id: deletedProfile.id, name: deletedProfile.name });
+    
+    // Don't allow deleting the last profile
+    if (user.portfolioProfiles.length === 1) {
+      console.log('Backend: Cannot delete last profile');
+      return res.status(400).json({
+        error: { message: 'Cannot delete the last portfolio profile' }
+      });
+    }
+
+    user.portfolioProfiles.splice(profileIndex, 1);
+    
+    // If deleted profile was default, set another as default
+    if (deletedProfile.isDefault && user.portfolioProfiles.length > 0) {
+      user.portfolioProfiles[0].isDefault = true;
+    }
+    
+    await user.save();
+    console.log('Backend: Portfolio profile deleted successfully');
+
+    res.json({
+      success: true,
+      message: 'Portfolio profile deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Portfolio profile deletion error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Check portfolio username availability
+app.get('/api/portfolio-profiles/check-username/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || username.length < 3 || username.length > 30) {
+      return res.status(400).json({
+        error: { message: 'Username must be between 3-30 characters' }
+      });
+    }
+    
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return res.status(400).json({
+        error: { message: 'Username can only contain letters, numbers, underscores, and hyphens' }
+      });
+    }
+    
+    const existingPortfolio = await User.findOne({
+      'portfolioProfiles.portfolioData.portfolioUsername': username.toLowerCase()
+    });
+    
+    res.json({
+      available: !existingPortfolio,
+      username: username.toLowerCase()
+    });
+    
+  } catch (error) {
+    console.error('Username check error:', error);
+    res.status(500).json({
+      error: { message: 'Internal server error' }
+    });
+  }
+});
+
+// Set default portfolio profile
+app.put('/api/portfolio-profiles/:profileId/set-default', authenticateToken, async (req, res) => {
+  try {
+    const { profileId } = req.params;
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        error: { message: 'User not found' }
+      });
+    }
+
+    const profile = user.portfolioProfiles.find(p => p.id === profileId);
+    if (!profile) {
+      return res.status(404).json({
+        error: { message: 'Portfolio profile not found' }
+      });
+    }
+
+    // Unset all defaults
+    user.portfolioProfiles.forEach(p => p.isDefault = false);
+    
+    // Set this profile as default
+    profile.isDefault = true;
+    profile.updatedAt = new Date();
+    
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Default portfolio profile updated successfully',
+      profile: profile
+    });
+
+  } catch (error) {
+    console.error('Set default portfolio profile error:', error);
     res.status(500).json({
       error: { message: 'Internal server error' }
     });
@@ -825,7 +1320,12 @@ app.get('/', (req, res) => {
       linkAnalytics: '/api/analytics/links/:linkId',
       
       // Public Access
-      publicProfile: '/api/public/profile/:username'
+      publicProfile: '/api/public/profile/:username',
+      publicPortfolio: '/api/public/portfolio/:username',
+      
+      // Portfolio Management
+      portfolioProfiles: '/api/portfolio-profiles',
+      checkUsername: '/api/portfolio-profiles/check-username/:username'
     }
   });
 });

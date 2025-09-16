@@ -127,6 +127,55 @@ class AuthAPIService {
     return await this.makeRequest(`/analytics/links/${linkId}`);
   }
 
+  // Portfolio Profile Management
+  async getPortfolioProfiles() {
+    return await this.makeRequest('/portfolio-profiles');
+  }
+
+  async createPortfolioProfile(profileData) {
+    try {
+      console.log('Making API request to create portfolio profile:', profileData);
+      const response = await this.makeRequest('/portfolio-profiles', {
+        method: 'POST',
+        body: JSON.stringify(profileData),
+      });
+      console.log('API response for create portfolio profile:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in createPortfolioProfile API call:', error);
+      throw error;
+    }
+  }
+
+  async updatePortfolioProfile(profileId, profileData) {
+    return await this.makeRequest(`/portfolio-profiles/${profileId}`, {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
+
+  async deletePortfolioProfile(profileId) {
+    return await this.makeRequest(`/portfolio-profiles/${profileId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async setDefaultPortfolioProfile(profileId) {
+    return await this.makeRequest(`/portfolio-profiles/${profileId}/set-default`, {
+      method: 'PUT',
+    });
+  }
+
+  // Portfolio Username Management
+  async checkPortfolioUsername(username) {
+    return await this.makeRequest(`/portfolio-profiles/check-username/${username}`);
+  }
+
+  // Public Portfolio Access
+  async getPublicPortfolio(username) {
+    return await this.makeRequest(`/public/portfolio/${username}`);
+  }
+
   logout() {
     localStorage.removeItem('authToken');
   }

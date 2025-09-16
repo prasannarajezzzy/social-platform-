@@ -25,7 +25,7 @@ import {
   Trash2,
   ShoppingBag
 } from 'lucide-react';
-import { useProfile } from '../contexts/ProfileContext';
+import { useProfile } from '../../contexts/ProfileContext';
 
 const ProfilePage = () => {
   const navigate = useNavigate();

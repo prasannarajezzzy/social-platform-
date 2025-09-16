@@ -25,8 +25,150 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { profileData, portfolioData, analyticsData, loadAnalytics } = useProfile();
+  const { profileData, portfolioData, analyticsData, loadAnalytics, portfolioProfiles, switchToPortfolioProfile, deletePortfolioProfile } = useProfile();
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Add CSS styles for portfolio list
+  const portfolioListStyles = `
+    .portfolio-list-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .portfolio-list-section .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .portfolio-list-section h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .portfolio-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .portfolio-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.2s ease;
+    }
+    
+    .portfolio-item:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+    
+    .portfolio-item-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .portfolio-item-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .portfolio-item-icon {
+      width: 40px;
+      height: 40px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+    }
+    
+    .portfolio-item-info h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .portfolio-item-description {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    .portfolio-item-meta {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .portfolio-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .portfolio-status.default {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .portfolio-status.normal {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    
+    .portfolio-date {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    
+    .portfolio-item-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .portfolio-list-footer {
+      text-align: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    .portfolio-empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #6b7280;
+    }
+    
+    .empty-state-icon {
+      margin-bottom: 1rem;
+      color: #d1d5db;
+    }
+    
+    .portfolio-empty-state h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .portfolio-empty-state p {
+      margin: 0 0 1.5rem 0;
+      font-size: 0.875rem;
+    }
+  `;
 
   // Get actual data from profile and analytics
   const customLinks = profileData.customLinks || [];
@@ -90,6 +232,25 @@ const Dashboard = () => {
   const handleAddLink = () => {
     // Redirect to profile settings links tab
     navigate('/profile?tab=links');
+  };
+
+  const handleDeletePortfolio = async (profileId) => {
+    if (window.confirm('Are you sure you want to delete this portfolio? This action cannot be undone.')) {
+      try {
+        await deletePortfolioProfile(profileId);
+      } catch (error) {
+        console.error('Error deleting portfolio:', error);
+        
+        // Handle specific error cases
+        if (error.message === 'Cannot delete the last portfolio profile') {
+          alert('You cannot delete your last portfolio. Please create another portfolio first before deleting this one.');
+        } else if (error.message === 'Portfolio profile not found') {
+          alert('This portfolio could not be found. It may have already been deleted.');
+        } else {
+          alert('Failed to delete portfolio. Please try again.');
+        }
+      }
+    }
   };
 
   const renderOverview = () => (
@@ -320,203 +481,91 @@ const Dashboard = () => {
   const renderPortfolio = () => (
     <div className="portfolio-content">
       <div className="section-header">
-        <h2>Portfolio</h2>
-        <div className="portfolio-actions">
-          {portfolioData.isPortfolioEnabled ? (
-            <>
-              <button 
-                className="btn btn-ghost"
-                onClick={() => navigate(`/portfolio/preview/${portfolioData.portfolioUsername || 'preview'}`)}
-              >
-                <Eye size={20} />
-                Preview
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={() => navigate('/portfolio/builder')}
-              >
-                <Edit3 size={20} />
-                Edit Portfolio
-              </button>
-            </>
-          ) : (
-            <button 
-              className="btn btn-primary"
-              onClick={() => navigate('/portfolio/builder')}
-            >
-              <Plus size={20} />
-              Create Portfolio
-            </button>
-          )}
-        </div>
+        <h2>Manage Portfolios</h2>
+        <button 
+          className="btn btn-primary"
+          onClick={() => navigate('/portfolio/builder', { state: { isNew: true } })}
+        >
+          <Plus size={20} />
+          Add Portfolio
+        </button>
       </div>
 
-      {portfolioData.isPortfolioEnabled ? (
-        <div className="portfolio-overview">
-          <div className="portfolio-grid">
-            <div className="portfolio-card">
-              <div className="portfolio-card-header">
-                <div className="portfolio-icon">
-                  <User size={24} />
-                </div>
+      {portfolioProfiles.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">
+            <Briefcase size={48} />
+          </div>
+          <h3>No portfolios yet</h3>
+          <p>Create your first portfolio to start building your professional presence</p>
+          <button className="btn btn-primary" onClick={() => navigate('/portfolio/builder', { state: { isNew: true } })}>
+            <Plus size={20} />
+            Create Your First Portfolio
+          </button>
+        </div>
+      ) : (
+        <div className="portfolio-grid">
+          {portfolioProfiles.map(profile => (
+            <div key={profile.id} className="portfolio-card">
+              <div className="portfolio-header">
                 <div className="portfolio-info">
-                  <h3>Portfolio Status</h3>
-                  <p className={`portfolio-status ${portfolioData.isPublic ? 'active' : 'draft'}`}>
-                    {portfolioData.isPublic ? 'Public' : 'Draft'}
-                  </p>
+                  <h4>{profile.name}</h4>
+                  <p>{profile.description || 'No description'}</p>
+                  {profile.description && (
+                    <small className="portfolio-description">{profile.description}</small>
+                  )}
                 </div>
-              </div>
-              {portfolioData.isPublic && (
-                <div className="portfolio-url">
-                  <label>Portfolio URL:</label>
-                  <div className="url-display">
-                    <code>{window.location.origin}/portfolio/{portfolioData.portfolioUsername}</code>
+                <div className="portfolio-actions">
+                  <button 
+                    className="action-btn"
+                    onClick={() => {
+                      switchToPortfolioProfile(profile.id);
+                      navigate('/portfolio/builder');
+                    }}
+                    title="Edit"
+                  >
+                    <Edit3 size={16} />
+                  </button>
+                  {profile.portfolioData?.isPublic && profile.portfolioData?.portfolioUsername && (
                     <button 
-                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/portfolio/${portfolioData.portfolioUsername}`)}
-                      className="copy-btn"
-                      title="Copy URL"
+                      className="action-btn"
+                      onClick={() => navigate(`/portfolio/${profile.portfolioData.portfolioUsername}`)}
+                      title="View portfolio"
                     >
                       <ExternalLink size={16} />
                     </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="portfolio-card">
-              <div className="portfolio-card-header">
-                <div className="portfolio-icon">
-                  <FileText size={24} />
-                </div>
-                <div className="portfolio-info">
-                  <h3>Portfolio Sections</h3>
-                  <p>{portfolioData.sections.length} sections</p>
-                </div>
-              </div>
-              <div className="section-list">
-                {portfolioData.sections.slice(0, 3).map((section, index) => (
-                  <div key={section.id} className="section-item">
-                    <span>{section.sectionName}</span>
-                    <span className="subsection-count">{section.subsections.length} items</span>
-                  </div>
-                ))}
-                {portfolioData.sections.length > 3 && (
-                  <div className="section-item">
-                    <span>+{portfolioData.sections.length - 3} more sections</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="portfolio-card">
-              <div className="portfolio-card-header">
-                <div className="portfolio-icon">
-                  <Eye size={24} />
-                </div>
-                <div className="portfolio-info">
-                  <h3>Portfolio Views</h3>
-                  <p>{portfolioData.portfolioViews || 0} total views</p>
+                  )}
+                  {portfolioProfiles.length > 1 && (
+                    <button 
+                      className="action-btn delete"
+                      onClick={() => handleDeletePortfolio(profile.id)}
+                      title="Delete portfolio"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="portfolio-stats">
-                <div className="stat-item">
-                  <span>Resume Downloads:</span>
-                  <span>0</span>
+                <div className="stat">
+                  <span className="stat-number">{profile.portfolioData?.sections?.length || 0}</span>
+                  <span className="stat-label">Sections</span>
                 </div>
-                <div className="stat-item">
-                  <span>Last Updated:</span>
-                  <span>{new Date(portfolioData.lastUpdated || Date.now()).toLocaleDateString()}</span>
+                <div className="portfolio-status">
+                  <span className={`status ${profile.isDefault ? 'default' : 'active'}`}>
+                    {profile.isDefault ? 'Default' : 'Active'}
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="portfolio-preview">
-            <div className="preview-header">
-              <h3>Portfolio Preview</h3>
-              <button 
-                className="btn btn-ghost"
-                onClick={() => navigate(`/portfolio/preview/${portfolioData.portfolioUsername || 'preview'}`)}
-              >
-                View Full Portfolio
-              </button>
-            </div>
-            <div className="preview-content">
-              <div className="preview-profile">
-                <div className="preview-avatar">
-                  {profileData.profileImageUrl ? (
-                    <img src={profileData.profileImageUrl} alt={profileData.name} />
-                  ) : (
-                    <User size={32} />
-                  )}
-                </div>
-                <div className="preview-info">
-                  <h4>{profileData.name || 'Your Name'}</h4>
-                  <p>{profileData.title || 'Your Title'}</p>
-                  {portfolioData.contactInfo.email && (
-                    <p className="preview-contact">{portfolioData.contactInfo.email}</p>
-                  )}
-                </div>
-              </div>
-              <div className="preview-sections">
-                {portfolioData.sections.slice(0, 2).map(section => (
-                  <div key={section.id} className="preview-section">
-                    <h5>{section.sectionName}</h5>
-                    <p>{section.subsections.length} {section.subsections.length === 1 ? 'item' : 'items'}</p>
-                  </div>
-                ))}
-                {portfolioData.sections.length === 0 && (
-                  <p className="preview-empty">No sections added yet</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="portfolio-empty">
-          <div className="empty-icon">
-            <Briefcase size={64} />
-          </div>
-          <h3>Create Your Professional Portfolio</h3>
-          <p>Build a stunning online portfolio to showcase your work, experience, and skills to potential employers and clients.</p>
+          ))}
           
-          <div className="portfolio-features">
-            <div className="feature-item">
-              <div className="feature-icon">
-                <User size={20} />
-              </div>
-              <div className="feature-content">
-                <h4>Professional Profile</h4>
-                <p>Add your contact information, resume, and professional details</p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">
-                <Briefcase size={20} />
-              </div>
-              <div className="feature-content">
-                <h4>Dynamic Sections</h4>
-                <p>Create custom sections for experience, education, skills, and projects</p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">
-                <Palette size={20} />
-              </div>
-              <div className="feature-content">
-                <h4>Professional Themes</h4>
-                <p>Choose from multiple professional themes to match your style</p>
-              </div>
-            </div>
+          <div className="add-portfolio-card">
+            <button className="add-portfolio-btn" onClick={() => navigate('/portfolio/builder', { state: { isNew: true } })}>
+              <Plus size={32} />
+              <span>Add New Portfolio</span>
+            </button>
           </div>
-
-          <button 
-            className="btn btn-primary btn-large"
-            onClick={() => navigate('/portfolio/builder')}
-          >
-            <Plus size={20} />
-            Get Started
-          </button>
         </div>
       )}
     </div>
@@ -570,6 +619,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
+      <style>{portfolioListStyles}</style>
       <div className="dashboard-header">
         <div className="container">
           <div className="header-content">
@@ -1067,6 +1117,108 @@ const Dashboard = () => {
           font-size: 0.8rem;
           margin-top: 4px;
           display: block;
+        }
+
+        /* Portfolio Grid Styles */
+        .portfolio-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 24px;
+        }
+
+        .portfolio-card {
+          background: var(--white);
+          border-radius: 12px;
+          padding: 24px;
+          border: 1px solid var(--light-gray);
+        }
+
+        .portfolio-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 16px;
+        }
+
+        .portfolio-info h4 {
+          font-weight: 600;
+          color: var(--dark-charcoal);
+          margin-bottom: 4px;
+        }
+
+        .portfolio-info p {
+          color: var(--dark-charcoal);
+          opacity: 0.7;
+          font-size: 0.875rem;
+        }
+
+        .portfolio-description {
+          color: #9ca3af;
+          font-size: 0.8rem;
+          margin-top: 4px;
+          display: block;
+        }
+
+        .portfolio-actions {
+          display: flex;
+          gap: 8px;
+        }
+
+        .portfolio-stats {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .portfolio-status .status {
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+
+        .status.default {
+          background: rgba(59, 130, 246, 0.2);
+          color: #1e40af;
+        }
+
+        .status.active {
+          background: rgba(78, 205, 196, 0.2);
+          color: var(--soft-teal);
+        }
+
+        .add-portfolio-card {
+          background: var(--white);
+          border: 2px dashed var(--light-gray);
+          border-radius: 12px;
+          padding: 24px;
+          transition: all 0.3s ease;
+        }
+
+        .add-portfolio-card:hover {
+          border-color: var(--electric-blue);
+          background: var(--light-gray);
+        }
+
+        .add-portfolio-btn {
+          width: 100%;
+          background: none;
+          border: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          color: #6b7280;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .add-portfolio-btn:hover {
+          color: var(--electric-blue);
+        }
+
+        .add-portfolio-btn span {
+          font-weight: 500;
         }
 
         .products-grid {

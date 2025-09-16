@@ -1,4 +1,78 @@
 /* PortfolioDisplay CSS Styles */
+
+/* Subsection Layout Styles */
+.subsection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.subsection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subsection-timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.subsection-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+}
+
+.subsection-timeline .subsection-item {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.subsection-timeline .subsection-item::before {
+  content: '';
+  position: absolute;
+  left: -2.5rem;
+  top: 0.5rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Card Density Styles */
+.card-density-compact .subsection-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-density-comfortable .subsection-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-density-spacious .subsection-item {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-density-compact .subsection-grid {
+  gap: 1rem;
+}
+
+.card-density-comfortable .subsection-grid {
+  gap: 1.5rem;
+}
+
+.card-density-spacious .subsection-grid {
+  gap: 2rem;
+}
 .min-h-screen {
   min-height: 100vh;
 }
@@ -616,4 +690,100 @@
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
+}
+
+/* Font family classes */
+.portfolio-display .font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.portfolio-display .font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+.portfolio-display .font-open-sans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.portfolio-display .font-lato {
+  font-family: 'Lato', sans-serif;
+}
+
+.portfolio-display .font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.portfolio-display .font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.portfolio-display .font-source-sans {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+/* Font size classes */
+.portfolio-display .text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.portfolio-display .text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.portfolio-display .text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+/* Border radius classes */
+.portfolio-display .rounded-none {
+  border-radius: 0;
+}
+
+.portfolio-display .rounded-sm {
+  border-radius: 0.125rem;
+}
+
+.portfolio-display .rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.portfolio-display .rounded-xl {
+  border-radius: 0.75rem;
+}
+
+/* Shadow classes */
+.portfolio-display .shadow-none {
+  box-shadow: none;
+}
+
+.portfolio-display .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-display .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.portfolio-display .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Layout classes */
+.portfolio-display .max-w-3xl {
+  max-width: 48rem;
+}
+
+.portfolio-display .max-w-4xl {
+  max-width: 56rem;
+}
+
+.portfolio-display .max-w-6xl {
+  max-width: 72rem;
+}
+
+.portfolio-display .max-w-7xl {
+  max-width: 80rem;
 }

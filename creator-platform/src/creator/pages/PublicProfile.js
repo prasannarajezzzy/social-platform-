@@ -14,7 +14,7 @@ import {
   Share2,
   MoreHorizontal
 } from 'lucide-react';
-import { useProfile } from '../contexts/ProfileContext';
+import { useProfile } from '../../contexts/ProfileContext';
 
 const PublicProfile = () => {
   const { username } = useParams();
