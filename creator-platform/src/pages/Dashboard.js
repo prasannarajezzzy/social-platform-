@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../contexts/ProfileContext';
+import AuthDebugger from '../components/AuthDebugger';
 import { 
   BarChart3, 
   Users, 
@@ -620,6 +621,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <style>{portfolioListStyles}</style>
+      <AuthDebugger />
       <div className="dashboard-header">
         <div className="container">
           <div className="header-content">

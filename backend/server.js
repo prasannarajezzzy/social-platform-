@@ -295,6 +295,9 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
 app.post('/api/profile', authenticateToken, async (req, res) => {
   try {
     const { profileData, appearanceData, portfolioData } = req.body;
+    console.log('Saving profile for user:', req.user.id);
+    console.log('Profile data received:', profileData);
+    console.log('Appearance data received:', appearanceData);
     
     const updateData = {};
     if (profileData) updateData.profileData = profileData;
@@ -307,6 +310,8 @@ app.post('/api/profile', authenticateToken, async (req, res) => {
     }
     updateData.lastProfileUpdate = new Date();
 
+    console.log('Update data:', updateData);
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
       updateData,
@@ -314,10 +319,15 @@ app.post('/api/profile', authenticateToken, async (req, res) => {
     );
 
     if (!user) {
+      console.log('User not found:', req.user.id);
       return res.status(404).json({
         error: { message: 'User not found' }
       });
     }
+
+    console.log('Profile saved successfully for user:', user.username);
+    console.log('Updated profile data:', user.profileData);
+    console.log('Updated appearance data:', user.appearanceData);
 
     res.json({
       success: true,
@@ -801,6 +811,7 @@ app.get('/api/public/profile/:username', async (req, res) => {
       }
     };
 
+    console.log('Returning public profile with appearance data:', user.appearanceData);
     res.json(publicProfile);
 
   } catch (error) {

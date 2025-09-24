@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/authAPI';
+import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext();
 
@@ -12,6 +13,7 @@ export const useProfile = () => {
 };
 
 export const ProfileProvider = ({ children }) => {
+  const { isAuthenticated, user } = useAuth();
   const [profileData, setProfileData] = useState({
     profileImage: null,
     profileImageUrl: '',
@@ -81,7 +83,9 @@ export const ProfileProvider = ({ children }) => {
   const [analyticsData, setAnalyticsData] = useState(null);
 
   const loadProfileFromBackend = useCallback(async () => {
+    console.log('Loading profile from backend...');
     if (!authAPI.isAuthenticated()) {
+      console.log('User not authenticated, loading from localStorage');
       // If not authenticated, load from localStorage as fallback
       loadFromLocalStorage();
       return;
@@ -89,7 +93,9 @@ export const ProfileProvider = ({ children }) => {
 
     try {
       setIsLoading(true);
+      console.log('Fetching full profile from backend...');
       const response = await authAPI.getFullProfile();
+      console.log('Profile response received:', response);
       
       if (response.profile) {
         // Map backend data to frontend state
@@ -169,6 +175,9 @@ export const ProfileProvider = ({ children }) => {
 
         // Load analytics data
         await loadAnalytics();
+        console.log('Profile data loaded successfully');
+      } else {
+        console.log('No profile data received from backend');
       }
     } catch (error) {
       console.error('Error loading profile from backend:', error);
@@ -179,10 +188,44 @@ export const ProfileProvider = ({ children }) => {
     }
   }, []);
 
-  // Load profile data from backend on mount
+  // Load profile data from backend on mount and when authentication state changes
   useEffect(() => {
-    loadProfileFromBackend();
-  }, [loadProfileFromBackend]);
+    if (isAuthenticated) {
+      console.log('Authentication state changed - loading profile data');
+      loadProfileFromBackend();
+    } else {
+      console.log('User not authenticated - clearing profile data');
+      // Clear profile data when user logs out
+      setProfileData({
+        profileImage: null,
+        profileImageUrl: '',
+        name: '',
+        title: '',
+        bio: '',
+        username: '',
+        socialLinks: {
+          instagram: '',
+          twitter: '',
+          youtube: '',
+          linkedin: '',
+          github: '',
+          facebook: '',
+          tiktok: '',
+          website: ''
+        },
+        customLinks: []
+      });
+      setAppearanceData({
+        theme: 'lake-white',
+        brandColor: '#667eea',
+        backgroundColor: '#ffffff',
+        buttonStyle: 'rounded',
+        buttonLayout: 'stack',
+        font: 'inter',
+        customCSS: ''
+      });
+    }
+  }, [isAuthenticated, loadProfileFromBackend]);
 
   const loadFromLocalStorage = () => {
     const savedProfile = localStorage.getItem('userProfile');
@@ -207,8 +250,11 @@ export const ProfileProvider = ({ children }) => {
 
   const loadAnalytics = async () => {
     try {
+      console.log('Loading analytics...');
       const analytics = await authAPI.getAnalytics();
+      console.log('Analytics response:', analytics);
       setAnalyticsData(analytics.analytics);
+      console.log('Analytics data set successfully');
     } catch (error) {
       console.error('Error loading analytics:', error);
     }
