@@ -426,6 +426,16 @@ export const ProfileProvider = ({ children }) => {
           const response = await authAPI.saveProfile(backendProfileData, appearanceData, portfolioData);
           if (response.success) {
             console.log('Profile saved successfully to backend');
+            
+            // Automatically set profile to public when saving
+            try {
+              await authAPI.updateProfileSettings({ isPublic: true });
+              console.log('Profile set to public');
+            } catch (settingsError) {
+              console.warn('Failed to set profile to public:', settingsError);
+              // Don't fail the entire save operation if settings update fails
+            }
+            
             return { success: true };
           } else {
             throw new Error(response.error || 'Failed to save profile');

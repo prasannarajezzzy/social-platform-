@@ -12,25 +12,64 @@ import {
   ExternalLink,
   Heart,
   Share2,
-  MoreHorizontal
+  MoreHorizontal,
+  Loader2
 } from 'lucide-react';
 import { useProfile } from '../../contexts/ProfileContext';
+import { authAPI } from '../../services/authAPI';
 
 const PublicProfile = () => {
   const { username } = useParams();
-  const { profileData, appearanceData, getThemeStyles, getFontFamily, getButtonStyles, trackLinkClick } = useProfile();
+  const { getThemeStyles, getFontFamily, getButtonStyles, trackLinkClick } = useProfile();
   const [isFollowing, setIsFollowing] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [publicProfileData, setPublicProfileData] = useState(null);
+  const [publicAppearanceData, setPublicAppearanceData] = useState(null);
 
-  // For now, we'll display the current user's profile regardless of username
-  // In a real app, you'd fetch the profile data based on the username parameter
+  // Fetch public profile data based on username
+  useEffect(() => {
+    const fetchPublicProfile = async () => {
+      if (!username) {
+        setError('No username provided');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await authAPI.getPublicProfile(username);
+        
+        if (response && response.username) {
+          setPublicProfileData(response);
+          setPublicAppearanceData(response.appearanceData);
+        } else {
+          setError('Profile not found');
+        }
+      } catch (error) {
+        console.error('Error fetching public profile:', error);
+        setError(error.message || 'Failed to load profile');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPublicProfile();
+  }, [username]);
+
+  // Use public profile data if available, otherwise fallback to context data
+  const profileData = publicProfileData || {};
+  const appearanceData = publicAppearanceData || {};
 
   const themeStyles = getThemeStyles();
   const fontFamily = getFontFamily();
   const buttonStyles = getButtonStyles();
 
   // Get active custom links from profile data
-  const activeCustomLinks = profileData.customLinks ? profileData.customLinks.filter(link => link.isActive) : [];
+  const activeCustomLinks = profileData.profileData?.customLinks ? profileData.profileData.customLinks.filter(link => link.isActive) : [];
 
   const getSocialIcon = (platform) => {
     const icons = {
@@ -73,8 +112,8 @@ const PublicProfile = () => {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: profileData.title || 'Check out this profile',
-        text: profileData.bio || 'Amazing content creator',
+        title: profileData.profileData?.title || 'Check out this profile',
+        text: profileData.profileData?.bio || 'Amazing content creator',
         url: window.location.href,
       });
     } else {
@@ -130,7 +169,7 @@ const PublicProfile = () => {
   };
 
   const renderSocialLinks = () => {
-    const activeSocialLinks = Object.entries(profileData.socialLinks)
+    const activeSocialLinks = Object.entries(profileData.profileData?.socialLinks || {})
       .filter(([_, value]) => value);
 
     if (activeSocialLinks.length === 0) return null;
@@ -158,6 +197,40 @@ const PublicProfile = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="public-profile loading">
+        <div className="loading-container">
+          <Loader2 size={48} className="loading-spinner" />
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="public-profile error">
+        <div className="error-container">
+          <h2>Profile Not Found</h2>
+          <p>{error}</p>
+          <p>The profile you're looking for doesn't exist or is private.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profileData.name && !profileData.profileData) {
+    return (
+      <div className="public-profile error">
+        <div className="error-container">
+          <h2>Profile Not Available</h2>
+          <p>This profile is not publicly available.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className="public-profile"
@@ -169,27 +242,27 @@ const PublicProfile = () => {
     >
       <div className="profile-container">
         <div className="profile-header">
-          {profileData.profileImageUrl && (
+          {profileData.profileData?.profileImageUrl && (
             <div className="profile-image-container">
               <img 
-                src={profileData.profileImageUrl} 
+                src={profileData.profileData.profileImageUrl} 
                 alt="Profile" 
                 className="profile-image"
               />
             </div>
           )}
           
-          {profileData.title && (
+          {profileData.profileData?.title && (
             <h1 
               className="profile-title"
               style={{ color: themeStyles.primaryColor }}
             >
-              {profileData.title}
+              {profileData.profileData.title}
             </h1>
           )}
           
-          {profileData.bio && (
-            <p className="profile-bio">{profileData.bio}</p>
+          {profileData.profileData?.bio && (
+            <p className="profile-bio">{profileData.profileData.bio}</p>
           )}
           
           {renderSocialLinks()}
@@ -228,7 +301,7 @@ const PublicProfile = () => {
                 <div className="share-menu">
                   <button onClick={copyToClipboard}>Copy Link</button>
                   <a 
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(profileData.title || 'Check out this profile')}`}
+                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(profileData.profileData?.title || 'Check out this profile')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -472,6 +545,44 @@ const PublicProfile = () => {
         .no-links-message p {
           font-size: 1.1rem;
           margin: 0;
+        }
+
+        .loading-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          gap: 16px;
+        }
+
+        .loading-spinner {
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        .error-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          text-align: center;
+          padding: 20px;
+        }
+
+        .error-container h2 {
+          color: #dc2626;
+          margin-bottom: 16px;
+        }
+
+        .error-container p {
+          color: #6b7280;
+          margin-bottom: 8px;
         }
 
         @media (max-width: 768px) {

@@ -118,6 +118,13 @@ class AuthAPIService {
     });
   }
 
+  async updateProfileSettings(settings) {
+    return await this.makeRequest('/profile/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  }
+
   // Analytics
   async getAnalytics() {
     return await this.makeRequest('/analytics');
@@ -174,6 +181,11 @@ class AuthAPIService {
   // Public Portfolio Access
   async getPublicPortfolio(username) {
     return await this.makeRequest(`/public/portfolio/${username}`);
+  }
+
+  // Public Profile Access
+  async getPublicProfile(username) {
+    return await this.makeRequest(`/public/profile/${username}`);
   }
 
   logout() {
