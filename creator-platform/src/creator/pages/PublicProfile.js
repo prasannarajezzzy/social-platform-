@@ -44,6 +44,8 @@ const PublicProfile = () => {
         const response = await authAPI.getPublicProfile(username);
         
         if (response && response.username) {
+          console.log('Setting public profile data:', response);
+          console.log('Setting appearance data:', response.appearanceData);
           setPublicProfileData(response);
           setPublicAppearanceData(response.appearanceData);
         } else {
@@ -64,9 +66,70 @@ const PublicProfile = () => {
   const profileData = publicProfileData || {};
   const appearanceData = publicAppearanceData || {};
 
-  const themeStyles = getThemeStyles();
-  const fontFamily = getFontFamily();
-  const buttonStyles = getButtonStyles();
+  // Create theme functions based on the public profile's appearance data
+  const getPublicThemeStyles = () => {
+    const themes = {
+      'lake-white': {
+        background: 'linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%)',
+        primaryColor: '#1976d2',
+        secondaryColor: '#f5f5f5'
+      },
+      'sunset': {
+        background: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+        primaryColor: '#ff6b35',
+        secondaryColor: '#fff3e0'
+      },
+      'ocean': {
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        primaryColor: '#667eea',
+        secondaryColor: '#f0f4ff'
+      },
+      'forest': {
+        background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+        primaryColor: '#11998e',
+        secondaryColor: '#e8f5e8'
+      },
+      'midnight': {
+        background: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
+        primaryColor: '#3498db',
+        secondaryColor: '#ecf0f1'
+      },
+      'custom': {
+        background: appearanceData.backgroundColor || '#ffffff',
+        primaryColor: appearanceData.brandColor || '#667eea',
+        secondaryColor: '#f5f5f5'
+      }
+    };
+
+    return themes[appearanceData.theme] || themes['lake-white'];
+  };
+
+  const getPublicFontFamily = () => {
+    const fonts = {
+      'inter': 'Inter, sans-serif',
+      'poppins': 'Poppins, sans-serif',
+      'roboto': 'Roboto, sans-serif',
+      'montserrat': 'Montserrat, sans-serif',
+      'playfair': '"Playfair Display", serif'
+    };
+
+    return fonts[appearanceData.font] || fonts['inter'];
+  };
+
+  const getPublicButtonStyles = () => {
+    const styles = {
+      'rounded': { borderRadius: '12px' },
+      'pill': { borderRadius: '50px' },
+      'square': { borderRadius: '4px' },
+      'sharp': { borderRadius: '0' }
+    };
+
+    return styles[appearanceData.buttonStyle] || styles['rounded'];
+  };
+
+  const themeStyles = getPublicThemeStyles();
+  const fontFamily = getPublicFontFamily();
+  const buttonStyles = getPublicButtonStyles();
 
   // Get active custom links from profile data
   const activeCustomLinks = profileData.profileData?.customLinks ? profileData.profileData.customLinks.filter(link => link.isActive) : [];

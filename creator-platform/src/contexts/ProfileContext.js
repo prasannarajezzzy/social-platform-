@@ -411,6 +411,10 @@ export const ProfileProvider = ({ children }) => {
     setIsLoading(true);
     try {
       if (authAPI.isAuthenticated()) {
+        console.log('Saving profile - currentProfileId:', currentProfileId);
+        console.log('Profile data:', profileData);
+        console.log('Appearance data:', appearanceData);
+        
         // Prepare profile data for backend (exclude File objects and name)
         const backendProfileData = {
           ...profileData,
@@ -418,32 +422,27 @@ export const ProfileProvider = ({ children }) => {
           name: undefined // Name is stored at user level, not in profileData
         };
         
-        // If we have a current profile, update it; otherwise save to main portfolioData
-        if (currentProfileId) {
-          await updatePortfolioProfile(currentProfileId, { portfolioData });
-        } else {
-          // Save to backend API
-          const response = await authAPI.saveProfile(backendProfileData, appearanceData, portfolioData);
-          if (response.success) {
-            console.log('Profile saved successfully to backend');
-            
-            // Automatically set profile to public when saving
-            try {
-              await authAPI.updateProfileSettings({ isPublic: true });
-              console.log('Profile set to public');
-            } catch (settingsError) {
-              console.warn('Failed to set profile to public:', settingsError);
-              // Don't fail the entire save operation if settings update fails
-            }
-            
-            return { success: true };
-          } else {
-            throw new Error(response.error || 'Failed to save profile');
-          }
-        }
+        // Always save to main profile, not portfolio profiles when editing from profile page
+        // Save to backend API
+        const response = await authAPI.saveProfile(backendProfileData, appearanceData, portfolioData);
+        console.log('Backend response:', response);
         
-        console.log('Portfolio profile saved successfully');
-        return { success: true };
+        if (response.success) {
+          console.log('Profile saved successfully to backend');
+          
+          // Automatically set profile to public when saving
+          try {
+            await authAPI.updateProfileSettings({ isPublic: true });
+            console.log('Profile set to public');
+          } catch (settingsError) {
+            console.warn('Failed to set profile to public:', settingsError);
+            // Don't fail the entire save operation if settings update fails
+          }
+          
+          return { success: true };
+        } else {
+          throw new Error(response.error || 'Failed to save profile');
+        }
       } else {
         // For non-authenticated users, just keep in localStorage
         console.log('Profile saved to localStorage (user not authenticated)');
