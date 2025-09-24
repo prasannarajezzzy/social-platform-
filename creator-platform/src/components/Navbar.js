@@ -23,7 +23,7 @@ const Navbar = () => {
   const authLinks = isAuthenticated 
     ? [
         { path: '/dashboard', label: 'Dashboard' },
-        { path: '/portfolio', label: 'Portfolio' },
+        // { path: '/portfolio', label: 'Portfolio' },
         { onClick: handleLogout, label: 'Logout', icon: LogOut }
       ]
     : [

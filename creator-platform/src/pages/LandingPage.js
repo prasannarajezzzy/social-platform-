@@ -413,7 +413,7 @@ const LandingPage = () => {
         .feature-icon {
           width: 80px;
           height: 80px;
-          background: var(--coral-gradient);
+          background: var(--light-sky-blue);
           border-radius: 50%;
           display: flex;
           align-items: center;

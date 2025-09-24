@@ -667,13 +667,13 @@ const Dashboard = () => {
               <Link2 size={20} />
               Links
             </button>
-            <button 
+            {/* <button 
               className={`nav-tab ${activeTab === 'portfolio' ? 'active' : ''}`}
               onClick={() => setActiveTab('portfolio')}
             >
               <Briefcase size={20} />
               Portfolio
-            </button>
+            </button> */}
             {/* <button 
               className={`nav-tab ${activeTab === 'products' ? 'active' : ''}`}
               onClick={() => setActiveTab('products')}
@@ -1420,7 +1420,7 @@ const Dashboard = () => {
         .portfolio-icon {
           width: 48px;
           height: 48px;
-          background: linear-gradient(135deg, var(--electric-blue), var(--purple));
+          background: var(--light-sky-blue);
           border-radius: 12px;
           display: flex;
           align-items: center;
@@ -1693,7 +1693,7 @@ const Dashboard = () => {
         .feature-icon {
           width: 40px;
           height: 40px;
-          background: linear-gradient(135deg, var(--electric-blue), var(--purple));
+          background: var(--light-sky-blue);
           border-radius: 10px;
           display: flex;
           align-items: center;
