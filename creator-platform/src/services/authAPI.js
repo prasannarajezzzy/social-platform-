@@ -80,10 +80,10 @@ class AuthAPIService {
   }
 
   // Profile Management
-  async saveProfile(profileData, appearanceData) {
+  async saveProfile(profileData, appearanceData, portfolioData) {
     return await this.makeRequest('/profile', {
       method: 'POST',
-      body: JSON.stringify({ profileData, appearanceData }),
+      body: JSON.stringify({ profileData, appearanceData, portfolioData }),
     });
   }
 
@@ -118,6 +118,13 @@ class AuthAPIService {
     });
   }
 
+  async updateProfileSettings(settings) {
+    return await this.makeRequest('/profile/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  }
+
   // Analytics
   async getAnalytics() {
     return await this.makeRequest('/analytics');
@@ -125,6 +132,60 @@ class AuthAPIService {
 
   async getLinkAnalytics(linkId) {
     return await this.makeRequest(`/analytics/links/${linkId}`);
+  }
+
+  // Portfolio Profile Management
+  async getPortfolioProfiles() {
+    return await this.makeRequest('/portfolio-profiles');
+  }
+
+  async createPortfolioProfile(profileData) {
+    try {
+      console.log('Making API request to create portfolio profile:', profileData);
+      const response = await this.makeRequest('/portfolio-profiles', {
+        method: 'POST',
+        body: JSON.stringify(profileData),
+      });
+      console.log('API response for create portfolio profile:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in createPortfolioProfile API call:', error);
+      throw error;
+    }
+  }
+
+  async updatePortfolioProfile(profileId, profileData) {
+    return await this.makeRequest(`/portfolio-profiles/${profileId}`, {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
+
+  async deletePortfolioProfile(profileId) {
+    return await this.makeRequest(`/portfolio-profiles/${profileId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async setDefaultPortfolioProfile(profileId) {
+    return await this.makeRequest(`/portfolio-profiles/${profileId}/set-default`, {
+      method: 'PUT',
+    });
+  }
+
+  // Portfolio Username Management
+  async checkPortfolioUsername(username) {
+    return await this.makeRequest(`/portfolio-profiles/check-username/${username}`);
+  }
+
+  // Public Portfolio Access
+  async getPublicPortfolio(username) {
+    return await this.makeRequest(`/public/portfolio/${username}`);
+  }
+
+  // Public Profile Access
+  async getPublicProfile(username) {
+    return await this.makeRequest(`/public/profile/${username}`);
   }
 
   logout() {

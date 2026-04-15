@@ -25,7 +25,7 @@ import {
   Trash2,
   ShoppingBag
 } from 'lucide-react';
-import { useProfile } from '../contexts/ProfileContext';
+import { useProfile } from '../../contexts/ProfileContext';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -40,8 +40,7 @@ const ProfilePage = () => {
     isLoading,
     addCustomLink,
     updateCustomLink,
-    deleteCustomLink,
-    reorderCustomLinks
+    deleteCustomLink
   } = useProfile();
   
   const [activeTab, setActiveTab] = useState('profile');
@@ -283,10 +282,13 @@ const ProfilePage = () => {
             type="text"
             className="form-input"
             value={profileData.username}
-            onChange={(e) => handleProfileChange('username', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-            placeholder="e.g., johndoe"
+            readOnly
+            title="Username cannot be changed after signup"
+            style={{ cursor: 'not-allowed', opacity: 0.9, backgroundColor: 'var(--surface-muted, #f4f4f5)' }}
           />
-          <small className="form-help">Your profile will be available at: {window.location.origin}/u/{profileData.username || 'username'}</small>
+          <small className="form-help">
+            Username is permanent. Your profile URL: {window.location.origin}/u/{profileData.username || 'username'}
+          </small>
         </div>
 
         <div className="form-group">

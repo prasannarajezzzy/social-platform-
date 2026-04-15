@@ -442,7 +442,7 @@ const AboutUs = () => {
         .value-icon {
           width: 80px;
           height: 80px;
-          background: var(--coral-gradient);
+          background: var(--light-sky-blue);
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -644,7 +644,7 @@ const AboutUs = () => {
         .stats-icon {
           width: 48px;
           height: 48px;
-          background: var(--teal-gradient);
+          background: var(--light-sky-blue);
           border-radius: 12px;
           display: flex;
           align-items: center;

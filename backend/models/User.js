@@ -141,6 +141,312 @@ const userSchema = new mongoose.Schema({
     },
     customCSS: String
   },
+  portfolioData: {
+    isPortfolioEnabled: {
+      type: Boolean,
+      default: false
+    },
+    profileName: {
+      type: String,
+      default: 'My Portfolio'
+    },
+    fullName: String,
+    portfolioUsername: {
+      type: String,
+      sparse: true,
+      trim: true,
+      lowercase: true
+    },
+    resumeUrl: String,
+    contactInfo: {
+      phone: String,
+      email: String,
+      additionalContacts: [{
+        label: String,
+        value: String,
+        type: {
+          type: String,
+          enum: ['email', 'phone', 'website', 'social', 'other'],
+          default: 'other'
+        }
+      }]
+    },
+        sections: [{
+          id: {
+            type: String,
+            default: () => Date.now().toString()
+          },
+          sectionName: {
+            type: String,
+            required: [true, 'Section name is required']
+          },
+          bulletPoints: [String],
+          order: {
+            type: Number,
+            default: 0
+          },
+          subsections: [{
+            id: {
+              type: String,
+              default: () => Date.now().toString()
+            },
+            title: String,
+            bulletPoints: [String],
+            order: {
+              type: Number,
+              default: 0
+            },
+            dateRange: {
+              startDate: String,
+              endDate: String,
+              isCurrent: {
+                type: Boolean,
+                default: false
+              }
+            },
+            description: String,
+            tags: [String]
+          }]
+        }],
+    appearance: {
+      portfolioMode: {
+        type: String,
+        default: 'professional'
+      },
+      colorScheme: {
+        type: String,
+        default: 'blue'
+      },
+      layout: {
+        type: String,
+        default: 'modern'
+      },
+      fontFamily: {
+        type: String,
+        default: 'inter'
+      },
+      fontSize: {
+        type: String,
+        default: 'medium'
+      },
+      backgroundType: {
+        type: String,
+        default: 'solid'
+      },
+      backgroundColor: {
+        type: String,
+        default: '#ffffff'
+      },
+      backgroundPattern: {
+        type: String,
+        default: ''
+      },
+      textColor: {
+        type: String,
+        default: '#1f2937'
+      },
+      cardBorderRadius: {
+        type: String,
+        default: 'medium'
+      },
+      cardShadow: {
+        type: String,
+        default: 'medium'
+      },
+      subsectionLayout: {
+        type: String,
+        default: 'grid'
+      },
+      cardDensity: {
+        type: String,
+        default: 'comfortable'
+      },
+      customCSS: String
+    },
+    theme: {
+      type: String,
+      default: 'professional'
+    },
+    isPublic: {
+      type: Boolean,
+      default: false
+    },
+    portfolioViews: {
+      type: Number,
+      default: 0
+    },
+    lastUpdated: {
+      type: Date,
+      default: Date.now
+    }
+  },
+  // Multiple portfolio profiles support
+  portfolioProfiles: [{
+    id: {
+      type: String,
+      default: () => Date.now().toString()
+    },
+    name: {
+      type: String,
+      required: [true, 'Portfolio profile name is required']
+    },
+    description: String,
+    isDefault: {
+      type: Boolean,
+      default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    portfolioData: {
+      isPortfolioEnabled: {
+        type: Boolean,
+        default: true
+      },
+      profileName: {
+        type: String,
+        default: 'My Portfolio'
+      },
+      fullName: String,
+      portfolioUsername: {
+        type: String,
+        sparse: true,
+        trim: true,
+        lowercase: true
+      },
+      resumeUrl: String,
+      contactInfo: {
+        phone: String,
+        email: String,
+        additionalContacts: [{
+          label: String,
+          value: String,
+          type: {
+            type: String,
+            enum: ['email', 'phone', 'website', 'social', 'other'],
+            default: 'other'
+          }
+        }]
+      },
+      sections: [{
+        id: {
+          type: String,
+          default: () => Date.now().toString()
+        },
+        sectionName: {
+          type: String,
+          required: [true, 'Section name is required']
+        },
+        bulletPoints: [String],
+        order: {
+          type: Number,
+          default: 0
+        },
+        subsections: [{
+          id: {
+            type: String,
+            default: () => Date.now().toString()
+          },
+          title: String,
+          bulletPoints: [String],
+          order: {
+            type: Number,
+            default: 0
+          },
+          dateRange: {
+            startDate: String,
+            endDate: String,
+            isCurrent: {
+              type: Boolean,
+              default: false
+            }
+          },
+          description: String,
+          tags: [String]
+        }]
+      }],
+      appearance: {
+        portfolioMode: {
+          type: String,
+          default: 'professional'
+        },
+        colorScheme: {
+          type: String,
+          default: 'blue'
+        },
+        layout: {
+          type: String,
+          default: 'modern'
+        },
+        fontFamily: {
+          type: String,
+          default: 'inter'
+        },
+        fontSize: {
+          type: String,
+          default: 'medium'
+        },
+        backgroundType: {
+          type: String,
+          default: 'solid'
+        },
+        backgroundColor: {
+          type: String,
+          default: '#ffffff'
+        },
+        backgroundPattern: {
+          type: String,
+          default: ''
+        },
+        textColor: {
+          type: String,
+          default: '#1f2937'
+        },
+        cardBorderRadius: {
+          type: String,
+          default: 'medium'
+        },
+        cardShadow: {
+          type: String,
+          default: 'medium'
+        },
+        subsectionLayout: {
+          type: String,
+          default: 'grid'
+        },
+        cardDensity: {
+          type: String,
+          default: 'comfortable'
+        },
+        customCSS: String
+      },
+      theme: {
+        type: String,
+        default: 'professional'
+      },
+      isPublic: {
+        type: Boolean,
+        default: false
+      },
+      portfolioViews: {
+        type: Number,
+        default: 0
+      },
+      lastUpdated: {
+        type: Date,
+        default: Date.now
+      }
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   analytics: {
     profileViews: {
       total: { type: Number, default: 0 },

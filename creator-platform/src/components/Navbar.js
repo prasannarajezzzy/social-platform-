@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -23,6 +23,7 @@ const Navbar = () => {
   const authLinks = isAuthenticated 
     ? [
         { path: '/dashboard', label: 'Dashboard' },
+        // { path: '/portfolio', label: 'Portfolio' },
         { onClick: handleLogout, label: 'Logout', icon: LogOut }
       ]
     : [
@@ -124,7 +125,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .navbar {
           background: var(--white);
           box-shadow: 0 2px 10px rgba(44, 44, 44, 0.1);
