@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Heart,
   Share2,
-  MoreHorizontal,
   Loader2
 } from 'lucide-react';
 import { useProfile } from '../../contexts/ProfileContext';
@@ -20,7 +19,7 @@ import { authAPI } from '../../services/authAPI';
 
 const PublicProfile = () => {
   const { username } = useParams();
-  const { getThemeStyles, getFontFamily, getButtonStyles, trackLinkClick } = useProfile();
+  const { trackLinkClick } = useProfile();
   const [isFollowing, setIsFollowing] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

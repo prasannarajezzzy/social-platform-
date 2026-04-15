@@ -10,14 +10,11 @@ import {
   Eye, 
   ArrowLeft,
   ExternalLink,
-  Calendar,
-  Tag,
   Move,
   Palette,
   Layout,
   Type,
   Star,
-  X,
   FileText
 } from 'lucide-react';
 import { useProfile } from '../../contexts/ProfileContext';
@@ -46,10 +43,6 @@ const PortfolioBuilder = () => {
     updateAdditionalContact,
     deleteAdditionalContact,
     createPortfolioProfile,
-    updatePortfolioProfile,
-    deletePortfolioProfile,
-    switchToPortfolioProfile,
-    setDefaultPortfolioProfile,
     saveProfile,
     refreshPortfolioProfiles,
     isLoading
@@ -65,9 +58,9 @@ const PortfolioBuilder = () => {
     if (authAPI.isAuthenticated()) {
       refreshPortfolioProfiles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load profiles once on mount
   }, []);
   const [expandedSections, setExpandedSections] = useState({});
-  const [showProfileSelector, setShowProfileSelector] = useState(false);
   const hasResetData = useRef(false);
 
   useEffect(() => {
@@ -126,6 +119,7 @@ const PortfolioBuilder = () => {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset defaults when starting new portfolio
   }, [isCreatingNew]);
 
 
@@ -136,50 +130,11 @@ const PortfolioBuilder = () => {
     }));
   };
 
-  const handleSave = async () => {
-    try {
-      // If we're creating a new portfolio and have a profile name, create it
-      if (isCreatingNew && portfolioData.profileName?.trim()) {
-        const newProfile = await createPortfolioProfile(portfolioData.profileName, portfolioData.description || '', portfolioData);
-        alert('New portfolio created successfully!');
-        // After creating, we can continue editing or navigate to dashboard
-        // For now, let's navigate to dashboard
-        navigate('/dashboard');
-      } else if (currentProfileId) {
-        // If we have a current profile ID, update the existing portfolio
-        try {
-          await saveProfile();
-          alert('Portfolio saved successfully!');
-        } catch (error) {
-          if (error.message.includes('Profile not found')) {
-            // Refresh profiles and try to create a new one
-            await refreshPortfolioProfiles();
-            if (portfolioData.profileName?.trim()) {
-              await createPortfolioProfile(portfolioData.profileName, portfolioData.description || '', portfolioData);
-              alert('Portfolio created successfully!');
-              navigate('/dashboard');
-            } else {
-              alert('Profile not found. Please enter a portfolio name to create a new portfolio.');
-            }
-          } else {
-            throw error;
-          }
-        }
-      } else {
-        // If no profile name and no current profile, show error
-        alert('Please enter a portfolio name to create a new portfolio.');
-      }
-    } catch (error) {
-      console.error('Error saving portfolio:', error);
-      alert('Failed to save portfolio. Please try again.');
-    }
-  };
-
   const handleSaveAndContinue = async () => {
     try {
       // If we're creating a new portfolio and have a profile name, create it
       if (isCreatingNew && portfolioData.profileName?.trim()) {
-        const newProfile = await createPortfolioProfile(portfolioData.profileName, portfolioData.description || '', portfolioData);
+        await createPortfolioProfile(portfolioData.profileName, portfolioData.description || '', portfolioData);
         alert('New portfolio created successfully! You can continue editing.');
         // Don't navigate away, let user continue editing
       } else if (currentProfileId) {
@@ -246,31 +201,6 @@ const PortfolioBuilder = () => {
   };
 
 
-
-  const handleSwitchProfile = (profileId) => {
-    switchToPortfolioProfile(profileId);
-    setShowProfileSelector(false);
-  };
-
-  const handleDeleteProfile = async (profileId) => {
-    if (window.confirm('Are you sure you want to delete this portfolio profile?')) {
-      try {
-        await deletePortfolioProfile(profileId);
-      } catch (error) {
-        console.error('Error deleting profile:', error);
-      }
-    }
-  };
-
-  const handleSetDefault = async (profileId) => {
-    try {
-      await setDefaultPortfolioProfile(profileId);
-    } catch (error) {
-      console.error('Error setting default profile:', error);
-    }
-  };
-
-  const currentProfile = portfolioProfiles.find(p => p.id === currentProfileId);
 
   return (
     <div className="portfolio-builder min-h-screen bg-gray-50">

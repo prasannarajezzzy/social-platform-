@@ -40,8 +40,7 @@ const ProfilePage = () => {
     isLoading,
     addCustomLink,
     updateCustomLink,
-    deleteCustomLink,
-    reorderCustomLinks
+    deleteCustomLink
   } = useProfile();
   
   const [activeTab, setActiveTab] = useState('profile');

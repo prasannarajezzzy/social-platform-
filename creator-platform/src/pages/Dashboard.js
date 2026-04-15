@@ -5,28 +5,20 @@ import AuthDebugger from '../components/AuthDebugger';
 import { 
   BarChart3, 
   Users, 
-  DollarSign, 
   Eye, 
   Plus, 
   Edit3, 
   Trash2, 
   ExternalLink,
   Link2,
-  ShoppingBag,
   Settings,
-  Upload,
   TrendingUp,
-  Calendar,
-  Heart,
-  Briefcase,
-  User,
-  FileText,
-  Palette
+  Briefcase
 } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { profileData, portfolioData, analyticsData, loadAnalytics, portfolioProfiles, switchToPortfolioProfile, deletePortfolioProfile } = useProfile();
+  const { profileData, analyticsData, portfolioProfiles, switchToPortfolioProfile, deletePortfolioProfile } = useProfile();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Add CSS styles for portfolio list

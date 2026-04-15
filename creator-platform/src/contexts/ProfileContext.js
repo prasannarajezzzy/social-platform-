@@ -13,7 +13,7 @@ export const useProfile = () => {
 };
 
 export const ProfileProvider = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [profileData, setProfileData] = useState({
     profileImage: null,
     profileImageUrl: '',

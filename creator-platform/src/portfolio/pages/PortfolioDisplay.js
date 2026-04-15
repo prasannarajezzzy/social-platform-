@@ -6,7 +6,6 @@ import {
   Mail, 
   ExternalLink, 
   Calendar,
-  MapPin,
   Edit3,
   Share2,
   Eye,
@@ -69,10 +68,6 @@ const PortfolioDisplay = () => {
 
   // Determine which portfolio data to use
   const currentPortfolioData = publicPortfolioData?.portfolioData || portfolioData;
-  const currentProfileData = publicPortfolioData ? {
-    name: publicPortfolioData.portfolioData?.fullName || publicPortfolioData.name,
-    username: publicPortfolioData.portfolioData?.portfolioUsername
-  } : profileData;
 
   const getThemeStyles = () => {
     const appearance = currentPortfolioData.appearance || {};

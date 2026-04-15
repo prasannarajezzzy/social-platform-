@@ -4,14 +4,9 @@ import {
   Plus, 
   Edit3, 
   Trash2, 
-  Eye, 
   Star, 
   Copy,
   ExternalLink,
-  Calendar,
-  User,
-  Settings,
-  ArrowLeft,
   X,
   FileText,
   Link,
@@ -25,13 +20,11 @@ const PortfolioProfilesList = () => {
   const navigate = useNavigate();
   const {
     portfolioProfiles,
-    currentProfileId,
     updatePortfolioProfile,
     deletePortfolioProfile,
     setDefaultPortfolioProfile
   } = useProfile();
 
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProfile, setEditingProfile] = useState(null);
   const [editProfileName, setEditProfileName] = useState('');
