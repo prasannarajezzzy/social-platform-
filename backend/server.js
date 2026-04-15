@@ -16,21 +16,62 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Middleware — dynamic CORS so preview URLs (e.g. *.vercel.app) and FRONTEND_URL always match
+// (browser Origin has no trailing slash; env vars often do — normalize both)
+function normalizeOrigin(origin) {
+  if (!origin || typeof origin !== 'string') return '';
+  return origin.trim().replace(/\/$/, '');
+}
+
+function createCorsOrigin() {
+  const extraProd = [
+    'https://social-platform-five.vercel.app',
+    'https://social-platform-ch61hj9i7-prasannarajezzzys-projects.vercel.app'
+  ];
+  const fromEnv = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((s) => normalizeOrigin(s.trim()))
+    .filter(Boolean);
+
+  const prodAllowList = new Set([
+    ...extraProd.map(normalizeOrigin),
+    ...fromEnv
+  ]);
+
+  const isProd = process.env.NODE_ENV === 'production';
+
+  return function corsOrigin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+    const o = normalizeOrigin(origin);
+
+    if (!isProd) {
+      if (o === 'http://localhost:3000' || o === 'http://127.0.0.1:3000') {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    }
+
+    if (prodAllowList.has(o)) {
+      return callback(null, true);
+    }
+    if (/^https:\/\/[\w.-]+\.vercel\.app$/i.test(o)) {
+      return callback(null, true);
+    }
+    if (/^https:\/\/[\w.-]+\.netlify\.app$/i.test(o)) {
+      return callback(null, true);
+    }
+    console.warn('[CORS] Blocked origin:', o);
+    callback(new Error('Not allowed by CORS'));
+  };
+}
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        process.env.FRONTEND_URL,
-        'https://social-platform-five.vercel.app',
-        'https://social-platform-ch61hj9i7-prasannarajezzzys-projects.vercel.app',
-        'https://your-frontend-domain.vercel.app',
-        /\.vercel\.app$/,
-        /\.netlify\.app$/
-      ]
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: createCorsOrigin(),
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
