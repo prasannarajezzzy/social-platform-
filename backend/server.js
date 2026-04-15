@@ -300,7 +300,10 @@ app.post('/api/profile', authenticateToken, async (req, res) => {
     console.log('Appearance data received:', appearanceData);
     
     const updateData = {};
-    if (profileData) updateData.profileData = profileData;
+    if (profileData) {
+      const { username: _ignoredUsername, ...profileDataWithoutUsername } = profileData;
+      updateData.profileData = profileDataWithoutUsername;
+    }
     if (appearanceData) updateData.appearanceData = appearanceData;
     if (portfolioData) {
       updateData.portfolioData = {
@@ -350,7 +353,10 @@ app.put('/api/profile', authenticateToken, async (req, res) => {
     const { profileData, appearanceData } = req.body;
     
     const updateData = {};
-    if (profileData) updateData.profileData = profileData;
+    if (profileData) {
+      const { username: _ignoredUsername, ...profileDataWithoutUsername } = profileData;
+      updateData.profileData = profileDataWithoutUsername;
+    }
     if (appearanceData) updateData.appearanceData = appearanceData;
 
     const user = await User.findByIdAndUpdate(

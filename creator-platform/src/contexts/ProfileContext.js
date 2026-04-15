@@ -461,11 +461,12 @@ export const ProfileProvider = ({ children }) => {
         console.log('Profile data:', profileData);
         console.log('Appearance data:', appearanceData);
         
-        // Prepare profile data for backend (exclude File objects and name)
+        // Prepare profile data for backend (exclude File objects, name, username)
         const backendProfileData = {
           ...profileData,
           profileImage: undefined, // Remove File object, keep only profileImageUrl
-          name: undefined // Name is stored at user level, not in profileData
+          name: undefined, // Name is stored at user level, not in profileData
+          username: undefined // Username is immutable after signup
         };
         
         // Always save to main profile, not portfolio profiles when editing from profile page
